@@ -11,6 +11,7 @@
       task_id: ID
       task_title: String
       task_active_: Boolean
+      task_biddingEndsOn: Date
       task_bids: [Bid]
     }
 
