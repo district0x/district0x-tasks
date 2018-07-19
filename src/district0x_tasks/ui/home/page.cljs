@@ -2,13 +2,10 @@
   (:require
    [district.ui.component.page :refer [page]]
    [district.ui.graphql.subs :as gql]
-   [district0x-tasks.ui.marketplace.events :as mk-events]
    [district0x-tasks.ui.components.app-layout :refer [app-layout]]
    [re-frame.core :refer [subscribe dispatch]]
    [reagent.core :as r]
    [react-infinite]
-   [district0x-tasks.shared.utils :as shared-utils]
-   [district0x-tasks.ui.components.tiles :as tiles]
    [print.foo :refer [look] :include-macros true]
    [district0x-tasks.ui.utils :as utils]))
 

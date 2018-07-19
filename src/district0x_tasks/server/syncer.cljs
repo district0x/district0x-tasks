@@ -14,8 +14,7 @@
     [mount.core :as mount :refer [defstate]]
     [taoensso.timbre :as log]
     [cljs-ipfs-api.files :as ifiles]
-    [print.foo :refer [look] :include-macros true])
-  (:require-macros [district0x-tasks.server.macros :refer [try-catch]]))
+    [print.foo :refer [look] :include-macros true]))
 
 (declare start)
 (declare stop)

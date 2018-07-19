@@ -7,7 +7,6 @@
     [district.server.web3-watcher]
     [district0x-tasks.server.db]
     [district0x-tasks.server.deployer]
-    [district0x-tasks.server.emailer]
     [district0x-tasks.server.generator]
     [district0x-tasks.server.syncer]
     [district0x-tasks.shared.smart-contracts]
@@ -29,12 +28,10 @@
                                      (warn "Ethereum node went online again")
                                      (mount/stop #'district0x-tasks.server.db/district0x-tasks-db)
                                      (mount/start #'district0x-tasks.server.db/district0x-tasks-db
-                                                  #'district0x-tasks.server.syncer/syncer
-                                                  #'district0x-tasks.server.emailer/emailer))
+                                                  #'district0x-tasks.server.syncer/syncer))
                         :on-offline (fn []
                                       (warn "Ethereum node went offline")
-                                      (mount/stop #'district0x-tasks.server.syncer/syncer
-                                                  #'district0x-tasks.server.emailer/emailer))}
+                                      (mount/stop #'district0x-tasks.server.syncer/syncer))}
          :syncer {:ipfs-config {:host "http://127.0.0.1:5001" :endpoint "/api/v0"}}})
     (mount/except [#'district0x-tasks.server.deployer/deployer
                    #'district0x-tasks.server.generator/generator])

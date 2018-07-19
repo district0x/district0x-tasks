@@ -92,7 +92,8 @@
          :build-path "resources/public/contracts/build"
          :solc-err-only true
          :wc true
-         :contracts []}
+         :contracts ["DistrictVoting.sol"
+                     "Tasks.sol"]}
 
   :source-paths ["src" "test"]
 
@@ -133,7 +134,7 @@
                                 :pretty-print? false}}]}
 
   :cljsbuild {:builds [{:id "dev-server"
-                        :source-paths ["src/district0x-tasks/server" "src/district0x-tasks/shared" "test/district0x-tasks"]
+                        :source-paths ["src/district0x_tasks/server" "src/district0x_tasks/shared" "test/district0x_tasks"]
                         :figwheel {:on-jsload "district0x-tasks.server.dev/on-jsload"}
                         :compiler {:main "district0x-tasks.server.dev"
                                    :output-to "dev-server/district0x-tasks.js"

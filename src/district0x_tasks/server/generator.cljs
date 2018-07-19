@@ -14,8 +14,7 @@
     [district0x-tasks.server.deployer]
     [taoensso.timbre :as log]
     [mount.core :as mount :refer [defstate]]
-    [print.foo :refer [look] :include-macros true])
-  (:require-macros [district0x-tasks.server.macros :refer [try-catch]]))
+    [print.foo :refer [look] :include-macros true]))
 
 (def fs (js/require "fs"))
 

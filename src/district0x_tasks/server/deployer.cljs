@@ -6,13 +6,6 @@
     [district.server.config :refer [config]]
     [district.server.smart-contracts :refer [contract-event-in-tx contract-address deploy-smart-contract! write-smart-contracts!]]
     [district.server.web3 :refer [web3]]
-    [district0x-tasks.server.contract.dank-token :as dank-token]
-    [district0x-tasks.server.contract.ds-auth :as ds-auth]
-    [district0x-tasks.server.contract.ds-guard :as ds-guard]
-    [district0x-tasks.server.contract.eternal-db :as eternal-db]
-    [district0x-tasks.server.contract.meme-auction-factory :as meme-auction-factory]
-    [district0x-tasks.server.contract.mutable-forwarder :as mutable-forwarder]
-    [district0x-tasks.server.contract.registry :as registry]
     [mount.core :as mount :refer [defstate]]))
 
 (declare deploy)

@@ -1,14 +1,43 @@
 # district0x-tasks
 
-A Clojure library designed to ... well, that part is up to you.
+## Development
+First time run
+```
+lein deps
+```
 
-## Usage
+Compile contracts (assumes you have `solc` installed):
+```bash
+lein solc
+```
 
-FIXME
+Auto compile contracts on changes:
+```bash
+lein solc auto
+```
 
-## License
+Start ipfs:
+```
+ipfs daemon
+```
 
-Copyright © 2018 FIXME
+Start server:
+```bash
+ganache-cli -p 8549
+lein repl
+(start-server!)
+node dev-server/district0x-tasks.js
+```
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+Start UI:
+```bash
+lein repl
+(start-ui!)
+# go to http://localhost:4598/
+```
+
+Start tests:
+```bash
+ganache-cli -p 8549
+lein test-dev
+```
