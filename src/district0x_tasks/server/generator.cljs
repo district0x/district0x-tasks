@@ -18,10 +18,22 @@
 
 (def fs (js/require "fs"))
 
-(declare start)
 (defstate ^{:on-reload :noop} generator :start (start (merge (:generator @config)
                                                              (:generator (mount/args)))))
 
+(defn generate-tasks [{:keys [:accounts :memes/use-accounts :memes/items-per-account :memes/scenarios]}]
+  (println "Generate-tasks println")
+  #_(let [[max-total-supply max-auction-duration deposit commit-period-duration reveal-period-duration]
+        (->> (eternal-db/get-uint-values :meme-registry-db [:max-total-supply :max-auction-duration :deposit :commit-period-duration
+                                                            :reveal-period-duration])
+             (map bn/number))
+        scenarios (get-scenarios (look {:accounts accounts
+                                        :use-accounts use-accounts
+                                        :items-per-account items-per-account
+                                        :scenarios scenarios}))]
+    ))
+
 
 (defn start [opts]
-      )
+  (let [opts (assoc opts :accounts (web3-eth/accounts @web3))]
+    (generate-tasks opts)))

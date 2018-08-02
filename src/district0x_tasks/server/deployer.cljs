@@ -8,11 +8,14 @@
     [district.server.web3 :refer [web3]]
     [mount.core :as mount :refer [defstate]]))
 
-(declare deploy)
-(defstate ^{:on-reload :noop} deployer
-  :start (deploy (merge (:deployer @config)
-                        (:deployer (mount/args)))))
 
+(def tasks-placeholder "feedfeedfeedfeedfeedfeedfeedfeedfeedfeed")
+
+(defn deploy-tasks-token! [default-opts]
+  (deploy-smart-contract! :tasks (merge default-opts {:gas 2200000
+                                                      ; :arguments [] argument to contract constructor
+                                                      ;:placeholder-replacements {tasks-placeholder :tasks}
+                                                      })))
 
 (defn deploy [{:keys [:write?]
                :as deploy-opts}]
@@ -20,5 +23,11 @@
         deploy-opts (merge {:from (last accounts)}
                            deploy-opts)]
 
-       (when write?
-             (write-smart-contracts!))))
+    (deploy-tasks-token! deploy-opts)
+
+    (when write?
+      (write-smart-contracts!))))
+
+(defstate ^{:on-reload :noop} deployer
+  :start (deploy (merge (:deployer @config)
+                        (:deployer (mount/args)))))
