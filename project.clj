@@ -71,8 +71,8 @@
             [lein-cljsbuild "1.1.7"]
             [lein-figwheel "0.5.16"]
             [lein-shell "0.5.0"]
-            [lein-solc "1.0.0"]
-            [lein-doo "0.1.8"]
+            [lein-solc "1.0.1"]
+            [lein-doo "0.1.10"]
             [lein-npm "0.6.2"]
             [lein-pdo "0.1.1"]
             [lein-garden "0.3.0"]]
@@ -84,7 +84,7 @@
                        [express "4.15.3"]
                        [cors "2.8.4"]
                        [graphql-fields "1.0.2"]
-                       [solc "0.4.20"]
+                       [solc "0.4.24"]
                        [source-map-support "0.5.3"]
                        [ws "4.0.0"]]}
 
@@ -92,8 +92,7 @@
          :build-path "resources/public/contracts/build"
          :solc-err-only true
          :wc true
-         :contracts ["DistrictVoting.sol"
-                     "Tasks.sol"]}
+         :contracts :all}
 
   :source-paths ["src" "test"]
 
@@ -117,7 +116,7 @@
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.9.0"]
                                   [binaryage/devtools "0.9.9"]
                                   [com.cemerick/piggieback "0.2.2"]
-                                  [figwheel-sidecar "0.5.14" :exclusions [org.clojure/core.async]]
+                                  [figwheel-sidecar "0.5.16" :exclusions [org.clojure/core.async]]
                                   [org.clojure/tools.reader "1.2.1"]
                                   [re-frisk "0.5.3"]]
                    :source-paths ["dev" "src"]
@@ -173,7 +172,16 @@
                                    :optimizations :advanced
                                    :closure-defines {goog.DEBUG false}
                                    :pretty-print false
-                                   :pseudo-names false}}]}
+                                   :pseudo-names false}}
+                       {:id "server-tests"
+                        :source-paths ["src/district0x_tasks/server" "src/district0x_tasks/shared" "test/district0x_tasks"]
+                        :compiler {:main "district0x-tasks.runner"
+                                   :output-to "district0x-tasks-tests/district0x-tasks-server-tests.js",
+                                   :output-dir "district0x-tasks-tests",
+                                   :target :nodejs,
+                                   :optimizations :none,
+                                   :verbose false
+                                   :source-map true}}]}
 
 
 
