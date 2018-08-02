@@ -1,4 +1,4 @@
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.24;
 
 contract DistrictVoting {
     event onVote(address indexed voter, uint indexed candidate);
