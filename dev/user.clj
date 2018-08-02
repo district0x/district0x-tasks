@@ -13,7 +13,3 @@
     (figwheel-sidecar.config/fetch-config)
     "dev")
   (figwheel-sidecar.repl-api/cljs-repl "dev"))
-
-(comment
-  (start-ui!)
-  (start-server!))
