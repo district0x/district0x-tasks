@@ -10,7 +10,7 @@
    [district.server.config :refer [config]]
    [district.server.db :refer [db]]
    [district.server.endpoints]
-   [district.server.graphql :as graphql]
+   #_[district.server.graphql :as graphql]
    [district.server.logging :refer [logging]]
    [district.server.middleware.logging :refer [logging-middlewares]]
    [district.server.smart-contracts]
@@ -40,7 +40,7 @@
 (def visit (aget graphql-module "visit"))
 
 (defn on-jsload []
-  (graphql/restart {:schema (utils/build-schema graphql-schema
+  #_(graphql/restart {:schema (utils/build-schema graphql-schema
                                                 resolvers-map
                                                 {:kw->gql-name graphql-utils/kw->gql-name
                                                  :gql-name->kw graphql-utils/gql-name->kw})
@@ -78,15 +78,15 @@
   (-> (mount/with-args
         {:config {:default {:logging {:level "info"
                                       :console? true}
-                            :graphql {:port 6500
-                                      :middlewares [logging-middlewares]
-                                      :schema (utils/build-schema graphql-schema
-                                                                  resolvers-map
-                                                                  {:kw->gql-name graphql-utils/kw->gql-name
-                                                                   :gql-name->kw graphql-utils/gql-name->kw})
-                                      :field-resolver (utils/build-default-field-resolver graphql-utils/gql-name->kw)
-                                      :path "/graphql"
-                                      :graphiql true}
+                            ;; :graphql {:port 6500
+                            ;;           :middlewares [logging-middlewares]
+                            ;;           :schema (utils/build-schema graphql-schema
+                            ;;                                       resolvers-map
+                            ;;                                       {:kw->gql-name graphql-utils/kw->gql-name
+                            ;;                                        :gql-name->kw graphql-utils/gql-name->kw})
+                            ;;           :field-resolver (utils/build-default-field-resolver graphql-utils/gql-name->kw)
+                            ;;           :path "/graphql"
+                            ;;           :graphiql true}
                             :web3 {:port 8549}
                             :generator {}
                             :deployer {}

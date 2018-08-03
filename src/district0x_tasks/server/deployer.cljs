@@ -6,7 +6,8 @@
     [district.server.config :refer [config]]
     [district.server.smart-contracts :refer [contract-event-in-tx contract-address deploy-smart-contract! write-smart-contracts!]]
     [district.server.web3 :refer [web3]]
-    [mount.core :as mount :refer [defstate]]))
+    [mount.core :as mount :refer [defstate]]
+    [district.server.smart-contracts :refer [contract-call]]))
 
 
 (def tasks-placeholder "feedfeedfeedfeedfeedfeedfeedfeedfeedfeed")
@@ -40,4 +41,4 @@
 (defn foo []
   (println "TASKS-FOO"
            (pr-str
-             (web3-eth/contract-call :tasks2 :foo))))
+             (contract-call :tasks :foo))))

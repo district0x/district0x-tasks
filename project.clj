@@ -133,7 +133,7 @@
                                 :pretty-print? false}}]}
 
   :cljsbuild {:builds [{:id "dev-server"
-                        :source-paths ["src/district0x_tasks/server" "src/district0x_tasks/shared" "test/district0x_tasks"]
+                        :source-paths ["src/district0x_tasks/server" "src/district0x_tasks/shared"]
                         :figwheel {:on-jsload "district0x-tasks.server.dev/on-jsload"}
                         :compiler {:main "district0x-tasks.server.dev"
                                    :output-to "dev-server/district0x-tasks.js"
