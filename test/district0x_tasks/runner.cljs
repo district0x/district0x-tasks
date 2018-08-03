@@ -3,7 +3,7 @@
             [district.graphql-utils :as graphql-utils]
             [district.server.graphql :as graphql]
             [district.server.graphql.utils :as utils]
-            ;[doo.runner :refer-macros [doo-tests]]
+            [doo.runner :refer-macros [doo-tests]]
             [district0x-tasks.contracts.tasks-test]))
 
 ; lein solc
@@ -38,5 +38,5 @@
 
 (deploy-contracts)
 
-#_(doo-tests
+(doo-tests
  'district0x-tasks.contracts.tasks-test)

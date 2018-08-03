@@ -11,7 +11,10 @@
 
 (def tasks-placeholder "feedfeedfeedfeedfeedfeedfeedfeedfeedfeed")
 
-(defn deploy-tasks-token! [default-opts]
+(defn deploy-district-voting! [default-opts]
+  (deploy-smart-contract! :district-voting (merge default-opts {:gas 2200000})))
+
+(defn deploy-tasks-contract! [default-opts]
   (deploy-smart-contract! :tasks (merge default-opts {:gas 2200000
                                                       ; :arguments [] argument to contract constructor
                                                       ;:placeholder-replacements {tasks-placeholder :tasks}
@@ -23,7 +26,8 @@
         deploy-opts (merge {:from (last accounts)}
                            deploy-opts)]
 
-    (deploy-tasks-token! deploy-opts)
+    (deploy-district-voting! deploy-opts)
+    (deploy-tasks-contract! deploy-opts)
 
     (when write?
       (write-smart-contracts!))))
@@ -31,3 +35,9 @@
 (defstate ^{:on-reload :noop} deployer
   :start (deploy (merge (:deployer @config)
                         (:deployer (mount/args)))))
+
+
+(defn foo []
+  (println "TASKS-FOO"
+           (pr-str
+             (web3-eth/contract-call :tasks2 :foo))))
