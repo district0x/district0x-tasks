@@ -7,28 +7,26 @@ contract DistrictVoting {
     address[] public voters;
     uint public endBlock;
 
-    function DistrictVoting(uint _endBlock) {
+    constructor(uint _endBlock) public {
         endBlock = _endBlock;
     }
 
-    function vote(uint candidate) {
-        require(candidate != 0);
+    function vote(uint candidate) public {
+        require(candidate > 0);
         require(endBlock == 0 || block.number <= endBlock);
         if (votes[msg.sender] == 0) {
             voters.push(msg.sender);
         }
         votes[msg.sender] = candidate;
-        onVote(msg.sender, candidate);
+        emit onVote(msg.sender, candidate);
     }
 
-    function votersCount()
-    constant
+    function votersCount() public view 
     returns(uint) {
         return voters.length;
     }
 
-    function getVoters(uint offset, uint limit)
-    constant
+    function getVoters(uint offset, uint limit) public view 
     returns(address[] _voters, uint[] _candidates)
     {
         if (offset < voters.length) {
