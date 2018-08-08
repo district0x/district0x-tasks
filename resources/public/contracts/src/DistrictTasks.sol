@@ -24,7 +24,7 @@ contract DistrictTasks is Ownable {
 
 
     modifier validBiddingEndsOn(uint biddingEndsOn) {
-        require(block.timestamp <= biddingEndsOn, "bidding_ends_on has to be in the future");
+        require(block.timestamp <= biddingEndsOn, "biddingEndsOn has to be in the future");
         _;
     }
 
@@ -34,7 +34,7 @@ contract DistrictTasks is Ownable {
     }
 
 
-    function addTask(string _title, bool _isActive, uint _biddingEndsOn)
+    function addTask(string _title, uint _biddingEndsOn, bool _isActive)
     public
     onlyOwner
     validTitle(_title)
@@ -61,5 +61,9 @@ contract DistrictTasks is Ownable {
     {
         tasks[_id].biddingEndsOn = _biddingEndsOn;
         emit LogUpdateBiddingEndsOn(_id, _biddingEndsOn);
+    }
+
+    function countTasks() public view returns (uint){
+        return tasks.length;
     }
 }

@@ -16,14 +16,15 @@
 
 (deftest tasks-test
   (let [tasks-contract (deployer/deploy-tasks-contract! {:from (last accounts)})]
-    (testing "Only Owner can add tasks, update active and bidding ends on"
+    (testing "Only Owner can addTasks, updateActive and updateBiddingEndsOn"
       (is (thrown? js/Error
-                   (contract-call :district-tasks :add-task "Title" true (+ (.getTime (js/Date.)) 86400)
+                   (contract-call :district-tasks :add-task "Title" (+ (.getTime (js/Date.)) 86400) true
                                   {:from (first accounts)}))
           "not an owner, should Error")
-      (is (contract-call :district-tasks :add-task
-                         "Title"
-                         true
-                         (+ (.getTime (js/Date.) 86400))
-                         {:from (last accounts)})
+      (is (string?
+            (contract-call :district-tasks :add-task
+                           "Title"
+                           (+ (.getTime (js/Date.) 86400))
+                           true
+                           {:from (last accounts)}))
           "the owner, should pass"))))
