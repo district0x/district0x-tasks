@@ -36,9 +36,3 @@
 (defstate ^{:on-reload :noop} deployer
   :start (deploy (merge (:deployer @config)
                         (:deployer (mount/args)))))
-
-
-(defn foo []
-  (println "TASKS-FOO"
-           (pr-str
-             (contract-call :tasks :foo))))
