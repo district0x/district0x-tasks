@@ -24,7 +24,7 @@ contract DistrictTasks is Ownable {
 
 
     modifier validBiddingEndsOn(uint biddingEndsOn) {
-        require(biddingEndsOn <= block.timestamp, "bidding_ends_on has to be in the future");
+        require(block.timestamp <= biddingEndsOn, "bidding_ends_on has to be in the future");
         _;
     }
 

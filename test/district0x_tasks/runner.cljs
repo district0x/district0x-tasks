@@ -6,29 +6,6 @@
             [doo.runner :refer-macros [doo-tests]]
             [district0x-tasks.contracts.tasks-test]))
 
-; lein solc
-
-; avoid run twice!
-; npm i -D chockidar
-; require chockidar
-; code watch resources/public/contracts/build
-; run deploy contract
-; run tests (touch)
-
-; lein doo node server-tests
-; write 1 test
-
-
-
-
-; http://grishaev.me/en/lein
-; https://www.gnu.org/software/make/
-
-; final conclusion is: it shouldn't be in cljs
-; it should be in shell
-; inotify-tools
-; incron - to raczej do systemu, a nie do projektu
-
 (nodejs/enable-util-print!)
 
 (set! (.-error js/console) (fn [x] (.log js/console x)))
