@@ -1,9 +1,9 @@
 (ns district0x-tasks.shared.smart-contracts) 
 
 (def smart-contracts 
-{:tasks
- {:name "Tasks",
-  :address "0xae9935257bb09e75dc6926bd14b389fcb31727f8"},
+{:district-tasks
+ {:name "DistrictTasks",
+  :address "0x41e2419a3fad6e909d570a1f98932e93feb092a9"},
  :district-voting
  {:name "DistrictVoting",
-  :address "0x814aa5f05a122f7f7d2b3ba204a73af9e95b30ba"}})
+  :address "0x01505e91931ac9b8b02044191411d0ccfbeebd5c"}})

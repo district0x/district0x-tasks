@@ -16,10 +16,10 @@
   (deploy-smart-contract! :district-voting (merge default-opts {:gas 2200000})))
 
 (defn deploy-tasks-contract! [default-opts]
-  (deploy-smart-contract! :tasks (merge default-opts {:gas 2200000
-                                                      ; :arguments [] argument to contract constructor
-                                                      ;:placeholder-replacements {tasks-placeholder :tasks}
-                                                      })))
+  (deploy-smart-contract! :district-tasks (merge default-opts {:gas 2200000
+                                                               ; :arguments [] argument to contract constructor
+                                                               ;:placeholder-replacements {tasks-placeholder :tasks}
+                                                               })))
 
 (defn deploy [{:keys [:write?]
                :as deploy-opts}]

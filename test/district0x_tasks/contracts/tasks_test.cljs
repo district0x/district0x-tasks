@@ -19,9 +19,9 @@
                                                          :arguments ["Task title"]})]
     (testing "Only Owner can manage they tasks, set them active, set end date for bidding"
       (is (thrown? js/Error
-                   (contract-call :tasks :set-active false {:from (first accounts)}))
+                   (contract-call :district-tasks :set-active false {:from (first accounts)}))
           "not an owner, should Error")
-      (is (contract-call :tasks :set-active false {:from (last accounts)})
+      (is (contract-call :district-tasks :set-active false {:from (last accounts)})
           "the owner try"))))
 
 
