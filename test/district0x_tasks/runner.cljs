@@ -33,10 +33,5 @@
 
 (set! (.-error js/console) (fn [x] (.log js/console x)))
 
-(defn deploy-contracts []
-  (println "DEPLOY CONTRACTS!!!!!!"))
-
-(deploy-contracts)
-
 (doo-tests
  'district0x-tasks.contracts.tasks-test)
