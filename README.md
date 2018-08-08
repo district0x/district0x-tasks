@@ -36,8 +36,16 @@ lein repl
 # go to http://localhost:4598/
 ```
 
-Start tests:
+# How to do tests:
+
 ```bash
 ganache-cli -p 8549
-lein test-dev
+lein test-doo
 ```
+
+If change contracts code:
+```
+; auto compile Solidity code in project when files changed
+lein solc auto
+```
+Remember this doesn't trigger cljs tests. So you have to change cljs tests files to trigger. For example add new line.
