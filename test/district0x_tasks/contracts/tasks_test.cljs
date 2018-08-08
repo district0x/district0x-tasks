@@ -21,10 +21,18 @@
                    (contract-call :district-tasks :add-task "Title" (+ (.getTime (js/Date.)) 86400) true
                                   {:from (first accounts)}))
           "not an owner, should Error")
-      (is (string?
-            (contract-call :district-tasks :add-task
-                           "Title"
-                           (+ (.getTime (js/Date.) 86400))
-                           true
-                           {:from (last accounts)}))
-          "the owner, should pass"))))
+      (is (contract-call :district-tasks :add-task
+                         "Title"
+                         (+ (.getTime (js/Date.) 86400))
+                         true
+                         {:from (last accounts)})
+          "the owner, should pass")
+      (is (= 1 (-> (contract-call :district-tasks :count-tasks)
+                   (bn/number)))))
+
+    (testing "Add Bids to created tasks[0]"
+      (is (contract-call :district-tasks :add-bid
+                         0
+                         {}))
+      (is (= 1 (-> (contract-call :district-tasks :count-bids 0)
+                   (bn/number)))))))

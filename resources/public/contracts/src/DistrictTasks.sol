@@ -2,10 +2,22 @@ pragma solidity ^0.4.24;
 
 import "./Ownable.sol";
 
+/*
+    Only Owner of contract can add and update Tasks.
+    Everybody can add Bids to Tasks.
+    Everybody can Vote on Bids.
+*/
+
 contract DistrictTasks is Ownable {
+    struct Bids {
+        address creator;
+        address[] voters;
+    }
+
     struct Task {
         uint biddingEndsOn;
         bool isActive;
+        Bids[] bids;
     }
 
     Task[] public tasks;
@@ -16,6 +28,18 @@ contract DistrictTasks is Ownable {
         string title,
         bool isActive,
         uint biddingEndsOn
+    );
+
+    event LogAddBid (
+        uint indexed taskId,
+        uint indexed bidId,
+        address creator
+    );
+
+    event LogAddVoter (
+        uint indexed taskId,
+        uint indexed bidId,
+        address voter
     );
     
     event LogUpdateActive(uint indexed id, bool isActive);
@@ -33,6 +57,7 @@ contract DistrictTasks is Ownable {
         _;
     }
 
+    // tasks
 
     function addTask(string _title, uint _biddingEndsOn, bool _isActive)
     public
@@ -40,9 +65,11 @@ contract DistrictTasks is Ownable {
     validTitle(_title)
     validBiddingEndsOn(_biddingEndsOn)
     {
-        uint _id = tasks.push(Task(_biddingEndsOn, _isActive)) - 1;
+        uint _taskId = tasks.length++;
+        tasks[_taskId].biddingEndsOn = _biddingEndsOn;
+        tasks[_taskId].isActive = _isActive;
         emit LogAddTask(
-            _id,
+            _taskId,
             _title,
             _isActive,
             _biddingEndsOn
@@ -65,5 +92,28 @@ contract DistrictTasks is Ownable {
 
     function countTasks() public view returns (uint){
         return tasks.length;
+    }
+
+    // bids
+
+    function addBid(uint _taskId) public {
+        uint _bidId = tasks[_taskId].bids.length++;
+        tasks[_taskId].bids[_bidId].creator = msg.sender;
+        emit LogAddBid(_taskId, _bidId, msg.sender);
+    }
+
+    function countBids(uint _taskId) public view returns (uint){
+        return tasks[_taskId].bids.length;
+    }
+
+    // votes
+
+    function addVoter(uint _taskId, uint _bidId) public {
+        tasks[_taskId].bids[_bidId].voters.push(msg.sender);
+        emit LogAddVoter(_taskId, _bidId, msg.sender);
+    }
+
+    function countVoters(uint _taskId, uint _bidId) public view returns (uint){
+        return tasks[_taskId].bids[_bidId].voters.length;
     }
 }
