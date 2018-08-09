@@ -18,9 +18,9 @@
 (deftest tasks-test
   (testing "Only Owner can addTasks, updateActive and updateBiddingEndsOn"
     (is (thrown? js/Error
-                 (district-tasks/add-task "Title" (+ (.getTime (js/Date.)) 86400) true {:from (last accounts)}))
+                 (district-tasks/add-task "Title" (+ (.getTime (js/Date.)) 10000) true {:from (last accounts)}))
         "not an owner, should Error")
-    (is (district-tasks/add-task "Title" (+ (.getTime (js/Date.)) 86400) true {:from (first accounts)})
+    (is (district-tasks/add-task "Title" (+ (.getTime (js/Date.)) 10000) true {:from (first accounts)})
         "the owner, should pass")
     (is (= 1 (district-tasks/count-tasks {}))))
 
@@ -30,4 +30,6 @@
 
   (testing "Add Voters to created tasks[0]->bid[0]"
     (is (district-tasks/add-voter 0 0 {}))
+    (is (thrown? js/Error (district-tasks/add-voter 0 0 {}))
+        "this should fail, because voter already voted")
     (is (= 1 (district-tasks/count-voters 0 0 {})))))
