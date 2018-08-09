@@ -9,17 +9,8 @@
     [mount.core :as mount :refer [defstate]]
     [district.server.smart-contracts :refer [contract-call]]))
 
-
-(def tasks-placeholder "feedfeedfeedfeedfeedfeedfeedfeedfeedfeed")
-
-(defn deploy-district-voting! [default-opts]
-  (deploy-smart-contract! :district-voting (merge default-opts {:gas 2200000})))
-
 (defn deploy-tasks-contract! [default-opts]
-  (deploy-smart-contract! :district-tasks (merge default-opts {:gas 2200000
-                                                               ; :arguments [] argument to contract constructor
-                                                               ;:placeholder-replacements {tasks-placeholder :tasks}
-                                                               })))
+  (deploy-smart-contract! :district-tasks (merge default-opts {:gas 1500000})))
 
 (defn deploy [{:keys [:write?]
                :as deploy-opts}]
@@ -27,7 +18,6 @@
         deploy-opts (merge {:from (last accounts)}
                            deploy-opts)]
 
-    (deploy-district-voting! deploy-opts)
     (deploy-tasks-contract! deploy-opts)
 
     (when write?
