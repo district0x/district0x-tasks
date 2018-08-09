@@ -9,7 +9,7 @@ import "./Ownable.sol";
 */
 
 contract DistrictTasks is Ownable {
-    struct Bids {
+    struct Bid {
         address creator;
         address[] voters;
         mapping(address => bool) voted;
@@ -18,7 +18,7 @@ contract DistrictTasks is Ownable {
     struct Task {
         uint biddingEndsOn;
         bool isActive;
-        Bids[] bids;
+        Bid[] bids;
     }
 
     Task[] public tasks;
@@ -47,6 +47,7 @@ contract DistrictTasks is Ownable {
     
     event LogUpdateBiddingEndsOn(uint indexed id, uint biddingEndsOn);
 
+
     modifier notEmptyString(string s) {
         require(bytes(s).length > 0, "String can't be empty");
         _;
@@ -54,6 +55,11 @@ contract DistrictTasks is Ownable {
 
     modifier validBiddingEndsOn(uint biddingEndsOn) {
         require(biddingEndsOn > block.timestamp, "biddingEndsOn > now failed, timestamp expired");
+        _;
+    }
+
+    modifier activeTask(uint taskId) {
+        require(tasks[taskId].isActive == true, "Task is set as not active by Onwer of the contract");
         _;
     }
 
@@ -86,13 +92,13 @@ contract DistrictTasks is Ownable {
         emit LogUpdateActive(_id, _isActive);
     }
 
-    function updateBiddingEndsOn(uint _id, uint _biddingEndsOn)
+    function updateBiddingEndsOn(uint _taskId, uint _biddingEndsOn)
     public
     onlyOwner
     validBiddingEndsOn(_biddingEndsOn)
     {
-        tasks[_id].biddingEndsOn = _biddingEndsOn;
-        emit LogUpdateBiddingEndsOn(_id, _biddingEndsOn);
+        tasks[_taskId].biddingEndsOn = _biddingEndsOn;
+        emit LogUpdateBiddingEndsOn(_taskId, _biddingEndsOn);
     }
 
     function countTasks() public view returns (uint){
@@ -103,6 +109,7 @@ contract DistrictTasks is Ownable {
 
     function addBid(uint _taskId) 
     public
+    activeTask(_taskId)
     validBiddingEndsOn(tasks[_taskId].biddingEndsOn) {
         uint _bidId = tasks[_taskId].bids.length++;
         tasks[_taskId].bids[_bidId].creator = msg.sender;
@@ -113,10 +120,16 @@ contract DistrictTasks is Ownable {
         return tasks[_taskId].bids.length;
     }
 
+    // function getBid(uint _taskId, uint _bidId) public view returns (uint, address[]) {
+    //     Bid storage bid = tasks[_taskId].bids[_bidId];
+    //     return(bid.creator, bid.voters);
+    // }
+
     // voters
 
     function addVoter(uint _taskId, uint _bidId)
     public
+    activeTask(_taskId)
     validBiddingEndsOn(tasks[_taskId].biddingEndsOn)
     voterDidntVote(_taskId, _bidId)
     {
@@ -127,5 +140,9 @@ contract DistrictTasks is Ownable {
 
     function countVoters(uint _taskId, uint _bidId) public view returns (uint){
         return tasks[_taskId].bids[_bidId].voters.length;
+    }
+
+    function isVoted(uint _taskId, uint _bidId, address _voter) public view returns (bool) {
+        return (tasks[_taskId].bids[_bidId].voted[_voter] == true);
     }
 }

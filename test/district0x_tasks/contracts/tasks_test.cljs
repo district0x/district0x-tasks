@@ -16,20 +16,50 @@
 (deployer/deploy-tasks-contract! {})
 
 (deftest tasks-test
-  (testing "Only Owner can addTasks, updateActive and updateBiddingEndsOn"
-    (is (thrown? js/Error
-                 (district-tasks/add-task "Title" (+ (.getTime (js/Date.)) 10000) true {:from (last accounts)}))
-        "not an owner, should Error")
-    (is (district-tasks/add-task "Title" (+ (.getTime (js/Date.)) 10000) true {:from (first accounts)})
-        "the owner, should pass")
-    (is (= 1 (district-tasks/count-tasks {}))))
+  (let [bidding-ends-on (+ (.getTime (js/Date.)) 10000)]
+    (testing "Only Owner can addTasks, updateActive and updateBiddingEndsOn"
+      (is (thrown? js/Error
+                   (district-tasks/add-task "Title" bidding-ends-on true {:from (last accounts)}))
+          "not an owner, should Error")
+      (is (district-tasks/add-task "Title" bidding-ends-on true {:from (first accounts)})
+          "the owner, should pass")
+      (is (= 1 (district-tasks/count-tasks {})))
+      (is (= (district-tasks/get-task 0 {})
+             {:bidding-ends-on bidding-ends-on
+              :active? true}))))
+
+  (let [bidding-ends-on (+ (.getTime (js/Date.)) 10000)
+        bidding-ends-on2 (+ bidding-ends-on 10000)]
+    (testing "Task update test"
+      (is (district-tasks/add-task "Update test" bidding-ends-on false {}))
+      (is (district-tasks/update-active 1 true {}))
+      (is (district-tasks/update-bidding-ends-on 1 bidding-ends-on2 {}))
+      (is (= (district-tasks/get-task 1 {})
+             {:bidding-ends-on bidding-ends-on2
+              :active? true}))))
 
   (testing "Add Bids to created tasks[0]"
     (is (district-tasks/add-bid 0 {}))
-    (is (= 1 (district-tasks/count-bids 0 {}))))
+    (is (= 1 (district-tasks/count-bids 0 {})))
+    #_(is (= (district-tasks/get-bid 0 0 {})
+           {:creator (first accounts)})))
 
-  (testing "Add Voters to created tasks[0]->bid[0]"
+  (testing "Add Voters to created tasks[0]->bids[0]"
     (is (district-tasks/add-voter 0 0 {}))
     (is (thrown? js/Error (district-tasks/add-voter 0 0 {}))
         "this should fail, because voter already voted")
-    (is (= 1 (district-tasks/count-voters 0 0 {})))))
+    (is (= 1 (district-tasks/count-voters 0 0 {})))
+    (is (true? (district-tasks/voted? 0 0 (first accounts) {})))
+    (is (false? (district-tasks/voted? 0 0 (last accounts) {})))
+
+    #_(is (= 123 (-> (contract-call :district-tasks :tasks 0 {})))))
+
+  #_(testing "BiddingEndsOn testing"
+      ))
+
+
+;; todo
+; update bids events
+; test timestamp expire
+; get bids
+; get voters
