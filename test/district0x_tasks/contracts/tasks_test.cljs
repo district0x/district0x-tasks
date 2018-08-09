@@ -26,4 +26,8 @@
 
   (testing "Add Bids to created tasks[0]"
     (is (district-tasks/add-bid 0 {}))
-    (is (= 1 (district-tasks/count-bids 0 {})))))
+    (is (= 1 (district-tasks/count-bids 0 {}))))
+
+  (testing "Add Voters to created tasks[0]->bid[0]"
+    (is (district-tasks/add-voter 0 0 {}))
+    (is (= 1 (district-tasks/count-voters 0 0 {})))))
