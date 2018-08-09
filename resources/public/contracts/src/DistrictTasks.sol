@@ -30,22 +30,27 @@ contract DistrictTasks is Ownable {
         bool isActive,
         uint biddingEndsOn
     );
+    
+    event LogUpdateTaskActive(uint indexed id, bool isActive);
+    event LogUpdateTaskBiddingEndsOn(uint indexed id, uint biddingEndsOn);
+    event LogUpdateTaskTitle(uint indexed id, string title);
 
     event LogAddBid (
         uint indexed taskId,
         uint indexed bidId,
-        address creator
+        string titile,
+        string description,
+        address indexed creator
     );
+
+    event LogUpdateBidTitle(uint taskId, uint bidTitle, string title);
+    event LogUpdateBidDescription(uint taskId, uint bidTitle, string description);
 
     event LogAddVoter (
         uint indexed taskId,
         uint indexed bidId,
         address voter
     );
-    
-    event LogUpdateActive(uint indexed id, bool isActive);
-    
-    event LogUpdateBiddingEndsOn(uint indexed id, uint biddingEndsOn);
 
 
     modifier notEmptyString(string s) {
@@ -87,18 +92,25 @@ contract DistrictTasks is Ownable {
         );
     }
 
-    function updateActive(uint _id, bool _isActive) public onlyOwner {
-        tasks[_id].isActive = _isActive;
-        emit LogUpdateActive(_id, _isActive);
+    function updateTaskActive(uint _taskId, bool _isActive) public onlyOwner {
+        tasks[_taskId].isActive = _isActive;
+        emit LogUpdateTaskActive(_taskId, _isActive);
     }
 
-    function updateBiddingEndsOn(uint _taskId, uint _biddingEndsOn)
+    function updateTaskBiddingEndsOn(uint _taskId, uint _biddingEndsOn)
     public
     onlyOwner
     validBiddingEndsOn(_biddingEndsOn)
     {
         tasks[_taskId].biddingEndsOn = _biddingEndsOn;
-        emit LogUpdateBiddingEndsOn(_taskId, _biddingEndsOn);
+        emit LogUpdateTaskBiddingEndsOn(_taskId, _biddingEndsOn);
+    }
+
+    function updateTaskTitle(uint _taskId, string _title)
+    public
+    notEmptyString(_title)
+    {
+        emit LogUpdateTaskTitle(_taskId, _title);
     }
 
     function countTasks() public view returns (uint){
@@ -107,23 +119,33 @@ contract DistrictTasks is Ownable {
 
     // bids
 
-    function addBid(uint _taskId) 
+    function addBid(uint _taskId, string _title, string _description)
     public
     activeTask(_taskId)
-    validBiddingEndsOn(tasks[_taskId].biddingEndsOn) {
+    validBiddingEndsOn(tasks[_taskId].biddingEndsOn)
+    notEmptyString(_title)
+    notEmptyString(_description)
+    {
         uint _bidId = tasks[_taskId].bids.length++;
         tasks[_taskId].bids[_bidId].creator = msg.sender;
-        emit LogAddBid(_taskId, _bidId, msg.sender);
+        emit LogAddBid(_taskId, _bidId, _title, _description, msg.sender);
+    }
+
+    function updateBidTitle(uint _taskId, uint _bidId, string _title) public notEmptyString(_title) {
+        emit LogUpdateBidTitle(_taskId, _bidId, _title);
+    }
+
+    function updateBidDescription(uint _taskId, uint _bidId, string _description) public notEmptyString(_description) {
+        emit LogUpdateBidDescription(_taskId, _bidId, _description);
     }
 
     function countBids(uint _taskId) public view returns (uint){
         return tasks[_taskId].bids.length;
     }
 
-    // function getBid(uint _taskId, uint _bidId) public view returns (uint, address[]) {
-    //     Bid storage bid = tasks[_taskId].bids[_bidId];
-    //     return(bid.creator, bid.voters);
-    // }
+    function getBid(uint _taskId, uint _bidId) public view returns (address) {
+        return tasks[_taskId].bids[_bidId].creator;
+    }
 
     // voters
 
@@ -136,6 +158,10 @@ contract DistrictTasks is Ownable {
         tasks[_taskId].bids[_bidId].voters.push(msg.sender);
         tasks[_taskId].bids[_bidId].voted[msg.sender] = true;
         emit LogAddVoter(_taskId, _bidId, msg.sender);
+    }
+
+    function getVoters(uint _taskId, uint _bidId) public view returns (address[]) {
+        return tasks[_taskId].bids[_bidId].voters;
     }
 
     function countVoters(uint _taskId, uint _bidId) public view returns (uint){

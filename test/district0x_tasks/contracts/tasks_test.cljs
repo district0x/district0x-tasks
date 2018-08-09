@@ -41,7 +41,7 @@
   (testing "Add Bids to created tasks[0]"
     (is (district-tasks/add-bid 0 "Bid title" "Bid description" {}))
     (is (= 1 (district-tasks/count-bids 0 {})))
-    #_(is (= (district-tasks/get-bid 0 0 {})
+    (is (= (district-tasks/get-bid 0 0 {})
            {:creator (first accounts)})))
 
   (testing "Add Voters to created tasks[0]->bids[0]"
@@ -52,15 +52,15 @@
     (is (true? (district-tasks/voted? 0 0 (first accounts) {})))
     (is (false? (district-tasks/voted? 0 0 (last accounts) {})))
 
-    #_(is (= 123 (-> (contract-call :district-tasks :tasks 0 {})))))
+    (is (= (district-tasks/get-voters 0 0 {})
+           [(first accounts)])))
 
-  #_(testing "BiddingEndsOn testing"
-      ))
+  (testing "BiddingEndsOn, Active testing"
+    (is (district-tasks/add-task "Title" (+ (.getTime (js/Date.)) 1000) false {}))))
 
 
 ;; todo
 ; test timestamp expire
-; get bids
-; get voters
 ; events test
+; get bids, voters with offset, limit ?
 

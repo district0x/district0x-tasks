@@ -62,10 +62,9 @@
       (bn/number)))
 
 (defn get-bid [task-id bid-id opts]
-  (let [[creator voters] (contract-call :district-tasks :get-bids task-id bid-id opts)]
-    {:creator creator
-     :voters voters}))
+  {:creator (contract-call :district-tasks :get-bid task-id bid-id opts)})
 
+; voters
 
 (defn add-voter [task-id bid-id opts]
   (contract-call :district-tasks :add-voter
@@ -73,14 +72,12 @@
                  bid-id
                  opts))
 
-; voters
-
 (defn count-voters [task-id bid-id opts]
   (-> (contract-call :district-tasks :count-voters task-id bid-id opts)
       (bn/number)))
 
 (defn get-voters [task-id bid-id opts]
-  )
+  (contract-call :district-tasks :get-voters task-id bid-id opts))
 
 (defn voted? [task-id bid-id voter opts]
   (contract-call :district-tasks :is-voted task-id bid-id voter opts))
