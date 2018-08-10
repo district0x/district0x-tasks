@@ -131,11 +131,17 @@ contract DistrictTasks is Ownable {
         emit LogAddBid(_taskId, _bidId, _title, _description, msg.sender);
     }
 
-    function updateBidTitle(uint _taskId, uint _bidId, string _title) public notEmptyString(_title) {
+    function updateBidTitle(uint _taskId, uint _bidId, string _title)
+    public
+    onlyOwner
+    notEmptyString(_title) {
         emit LogUpdateBidTitle(_taskId, _bidId, _title);
     }
 
-    function updateBidDescription(uint _taskId, uint _bidId, string _description) public notEmptyString(_description) {
+    function updateBidDescription(uint _taskId, uint _bidId, string _description)
+    public
+    onlyOwner
+    notEmptyString(_description) {
         emit LogUpdateBidDescription(_taskId, _bidId, _description);
     }
 
