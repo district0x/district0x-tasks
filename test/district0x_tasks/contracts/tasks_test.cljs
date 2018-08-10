@@ -6,7 +6,9 @@
             [district.server.smart-contracts :refer [contract-call]]
             [district0x-tasks.server.dev :as dev]
             [district0x-tasks.server.deployer :as deployer]
-            [district0x-tasks.server.contracts.district-tasks :as district-tasks]))
+            [district0x-tasks.server.contracts.district-tasks :as district-tasks]
+            [district.server.smart-contracts :refer [replay-past-events]]
+            [cljs-web3.evm :as web3-evm]))
 
 (dev/-main)
 
@@ -15,8 +17,13 @@
 ; {:from (first accounts)} is default account
 (deployer/deploy-tasks-contract! {})
 
+(defn now-in-seconds []
+  (-> (.getTime (js/Date.))
+      (quot 1000)
+      (inc)))
+
 (deftest tasks-test
-  (let [bidding-ends-on (+ (.getTime (js/Date.)) 10000)]
+  (let [bidding-ends-on (+ (now-in-seconds) 10)]
     (testing "Only Owner can addTasks, updateActive and updateBiddingEndsOn"
       (is (thrown? js/Error
                    (district-tasks/add-task "Title" bidding-ends-on true {:from (last accounts)}))
@@ -28,7 +35,7 @@
              {:bidding-ends-on bidding-ends-on
               :active? true}))))
 
-  (let [bidding-ends-on (+ (.getTime (js/Date.)) 10000)
+  (let [bidding-ends-on (+ (now-in-seconds) 10)
         bidding-ends-on2 (+ bidding-ends-on 1)]
     (testing "Task update test"
       (is (district-tasks/add-task "Update test" bidding-ends-on false {}))
@@ -55,12 +62,14 @@
     (is (= (district-tasks/get-voters 0 0 {})
            [(first accounts)])))
 
-  (testing "BiddingEndsOn, Active testing"
-    (is (district-tasks/add-task "Title" (+ (.getTime (js/Date.)) 1000) false {}))))
-
-
-;; todo
-; test timestamp expire
-; events test
-; get bids, voters with offset, limit ?
-
+  #_(testing "BiddingEndsOn, Active testing"
+      (district-tasks/add-task "Title" (+ (now-in-seconds) 1) false {})
+      (is (thrown? js/Error
+                   (district-tasks/add-bid 2 "Bid title" "Bid description" {}))
+          "should not pass, because task is not active")
+      (district-tasks/update-task-active 2 true {})
+      (web3-evm/increase-time! @web3 [1])
+      (web3-evm/mine! @web3)
+      (is (thrown? js/Error
+                   (district-tasks/add-bid 2 "Bid title" "Bid description" {}))
+          "should not pass, because BiddingEndsOn expired")))

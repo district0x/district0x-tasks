@@ -5,6 +5,7 @@
 ; tasks
 
 (defn add-task [title bidding-ends-on active? opts]
+  "bidding-end-in is Unix Timestamp in seconds"
   (contract-call :district-tasks :add-task title bidding-ends-on active? opts))
 
 (defn count-tasks [opts]
