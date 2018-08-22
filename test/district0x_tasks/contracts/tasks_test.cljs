@@ -14,13 +14,27 @@
 
 (def accounts (web3-eth/accounts @web3))
 
-; {:from (first accounts)} is default account
+;; {:from (first accounts)} is default account
 (deployer/deploy-tasks-contract! {})
 
+;; ganache-cli@6.1.8 block.timestamp is now instead of timestamp of last block
 (defn now-in-seconds []
   (-> (.getTime (js/Date.))
       (quot 1000)
       (inc)))
+
+#_(defn last-block-timestamp []
+    (->> (web3-eth/block-number @web3)
+         (web3-eth/get-block @web3)
+         :timestamp))
+
+;; temporary solution, because ganache-cli block.timestamp is now instead of last block timestamp
+(defn sleep [seconds]
+  (let [deadline (-> (* seconds 1000)
+                     (+ (.getTime (js/Date.))))]
+    (while (> deadline (.getTime (js/Date.))))))
+
+
 
 (deftest tasks-test
   (let [bidding-ends-on (+ (now-in-seconds) 10)]
@@ -62,14 +76,17 @@
     (is (= (district-tasks/get-voters 0 0 {})
            [(first accounts)])))
 
-  #_(testing "BiddingEndsOn, Active testing"
-      (district-tasks/add-task "Title" (+ (now-in-seconds) 1) false {})
-      (is (thrown? js/Error
-                   (district-tasks/add-bid 2 "Bid title" "Bid description" {}))
-          "should not pass, because task is not active")
-      (district-tasks/update-task-active 2 true {})
-      (web3-evm/increase-time! @web3 [1])
-      (web3-evm/mine! @web3)
-      (is (thrown? js/Error
-                   (district-tasks/add-bid 2 "Bid title" "Bid description" {}))
-          "should not pass, because BiddingEndsOn expired")))
+  (testing "BiddingEndsOn, Active testing"
+    (district-tasks/add-task "Title" (+ (now-in-seconds) 1) false {})
+    (is (thrown? js/Error
+                 (district-tasks/add-bid 2 "Bid title" "Bid description" {}))
+        "should not pass, because task is not active")
+    (district-tasks/update-task-active 2 true {})
+    ;; temporary solution, because ganache-cli block.timestamp is now instead of last block timestamp
+    (sleep 1)
+    ;; when block.timestamp will became last block timestamp
+    ;(web3-evm/increase-time! @web3 [1])
+    ;(web3-evm/mine! @web3)
+    (is (thrown? js/Error
+                 (district-tasks/add-bid 2 "Bid title" "Bid description" {}))
+        "should not pass, because BiddingEndsOn expired")))
