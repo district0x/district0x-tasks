@@ -2,15 +2,12 @@
   (:require [cljs.test :refer-macros [deftest is testing run-tests use-fixtures async]]
             [cljs.core.async :refer [<! timeout]]
             [cljs-web3.eth :as web3-eth]
-            [bignumber.core :as bn]
-            [bignumber.js :as bnjs]
             [district.server.web3 :refer [web3]]
             [district.server.smart-contracts :refer [contract-call]]
             [district0x-tasks.server.dev :as dev]
             [district0x-tasks.server.deployer :as deployer]
             [district0x-tasks.server.contracts.district-tasks :as district-tasks]
-            [district.server.smart-contracts :refer [replay-past-events contract-event-in-tx]]
-            [cljs-web3.evm :as web3-evm]))
+            [district.server.smart-contracts :refer [replay-past-events contract-event-in-tx]]))
 
 (dev/-main)
 
