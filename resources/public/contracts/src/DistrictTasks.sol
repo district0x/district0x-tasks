@@ -31,20 +31,27 @@ contract DistrictTasks is Ownable {
         uint biddingEndsOn
     );
     
-    event LogUpdateTaskActive(uint indexed id, bool isActive);
-    event LogUpdateTaskBiddingEndsOn(uint indexed id, uint biddingEndsOn);
-    event LogUpdateTaskTitle(uint indexed id, string title);
+    event LogUpdateTask(
+        uint indexed id, 
+        string title, 
+        uint biddingEndsOn,
+        bool isActive
+    );
 
     event LogAddBid (
         uint indexed taskId,
         uint indexed bidId,
-        string titile,
+        string title,
         string description,
         address indexed creator
     );
 
-    event LogUpdateBidTitle(uint taskId, uint bidTitle, string title);
-    event LogUpdateBidDescription(uint taskId, uint bidTitle, string description);
+    event LogUpdateBid(
+        uint taskId,
+        uint bidId,
+        string title,
+        string description
+    );
 
     event LogAddVoter (
         uint indexed taskId,
@@ -59,7 +66,7 @@ contract DistrictTasks is Ownable {
     }
 
     modifier validBiddingEndsOn(uint biddingEndsOn) {
-        require(biddingEndsOn > block.timestamp, "biddingEndsOn > now failed, timestamp expired");
+        require(biddingEndsOn > block.timestamp, "biddingEndsOn > block.timestamp failed, timestamp expired");
         _;
     }
 
@@ -92,25 +99,20 @@ contract DistrictTasks is Ownable {
         );
     }
 
-    function updateTaskActive(uint _taskId, bool _isActive) public onlyOwner {
-        tasks[_taskId].isActive = _isActive;
-        emit LogUpdateTaskActive(_taskId, _isActive);
-    }
-
-    function updateTaskBiddingEndsOn(uint _taskId, uint _biddingEndsOn)
+    function updateTask(uint _taskId, string _title, uint _biddingEndsOn, bool _isActive)
     public
     onlyOwner
+    notEmptyString(_title)
     validBiddingEndsOn(_biddingEndsOn)
     {
+        tasks[_taskId].isActive = _isActive;
         tasks[_taskId].biddingEndsOn = _biddingEndsOn;
-        emit LogUpdateTaskBiddingEndsOn(_taskId, _biddingEndsOn);
-    }
-
-    function updateTaskTitle(uint _taskId, string _title)
-    public
-    notEmptyString(_title)
-    {
-        emit LogUpdateTaskTitle(_taskId, _title);
+        emit LogUpdateTask(
+            _taskId,
+            _title,
+            _biddingEndsOn,
+            _isActive)
+        ;
     }
 
     function countTasks() public view returns (uint){
@@ -131,18 +133,12 @@ contract DistrictTasks is Ownable {
         emit LogAddBid(_taskId, _bidId, _title, _description, msg.sender);
     }
 
-    function updateBidTitle(uint _taskId, uint _bidId, string _title)
+    function updateBid(uint _taskId, uint _bidId, string _title, string _description)
     public
     onlyOwner
-    notEmptyString(_title) {
-        emit LogUpdateBidTitle(_taskId, _bidId, _title);
-    }
-
-    function updateBidDescription(uint _taskId, uint _bidId, string _description)
-    public
-    onlyOwner
+    notEmptyString(_title)
     notEmptyString(_description) {
-        emit LogUpdateBidDescription(_taskId, _bidId, _description);
+        emit LogUpdateBid(_taskId, _bidId, _title, _description);
     }
 
     function countBids(uint _taskId) public view returns (uint){
