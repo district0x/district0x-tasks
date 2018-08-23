@@ -29,12 +29,10 @@
                  description
                  opts))
 
-(defn update-bid [task-id bid-id title description opts]
-  (contract-call :district-tasks :update-bid
+(defn remove-bid [task-id bid-id opts]
+  (contract-call :district-tasks :remove-bid
                  task-id
                  bid-id
-                 title
-                 description
                  opts))
 
 (defn count-bids [task-id opts]
@@ -42,7 +40,10 @@
       (bn/number)))
 
 (defn get-bid [task-id bid-id opts]
-  {:creator (contract-call :district-tasks :get-bid task-id bid-id opts)})
+  (let [creator (contract-call :district-tasks :get-bid task-id bid-id opts)
+        deleted? (= "0x0000000000000000000000000000000000000000" creator)]
+    (when-not deleted?
+      {:creator creator})))
 
 ;;; voters
 
@@ -72,15 +73,11 @@
   (-> (update-in event [:args :task-id] bn/number)
       (update-in [:args :bid-id] bn/number)))
 
-(defn log-add-voter->cljs [event]
-  (-> (update-in event [:args :task-id] bn/number)
-      (update-in [:args :bid-id] bn/number)))
-
 (defn event->cljs [event]
   (let [convert (case (:event event)
                   "LogAddTask" log-task->cljs
                   "LogUpdateTask" log-task->cljs
                   "LogAddBid" log-bid->cljs
-                  "LogUpdateBid" log-bid->cljs
-                  "LogAddVoter" log-add-voter->cljs)]
+                  "LogRemoveBid" log-bid->cljs
+                  "LogAddVoter" log-bid->cljs)]
     (convert event)))

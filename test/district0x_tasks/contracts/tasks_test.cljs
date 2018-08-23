@@ -64,11 +64,17 @@
              {:bidding-ends-on bidding-ends-on2
               :active? true}))))
 
-  (testing "Add Bids to created tasks[0]"
+  (testing "Add / remove Bids to created tasks[0]"
     (is (district-tasks/add-bid 0 "Bid title" "Bid description" {}))
     (is (= 1 (district-tasks/count-bids 0 {})))
     (is (= (district-tasks/get-bid 0 0 {})
-           {:creator (first accounts)})))
+           {:creator (first accounts)}))
+    (is (district-tasks/add-bid 0 "Remove me" "Remove me" {}))
+    (is (district-tasks/remove-bid 0 1 {}))
+    (is (= 2 (district-tasks/count-bids 0 {}))
+        "Still count 2, because we can't change indexes of bids to not mess with events data")
+    (is (nil? (district-tasks/get-bid 0 1 {}))
+        "Try to get removed bid"))
 
   (testing "Add Voters to created tasks[0]->bids[0]"
     (is (district-tasks/add-voter 0 0 {}))
@@ -121,21 +127,19 @@
                  (contract-event-in-tx :district-tasks :LogAddBid {})
                  (event->test))
              {:args {:task-id 0
-                     :bid-id 1
+                     :bid-id 2
                      :title "Bid title"
                      :description "Bid description"
                      :creator (first accounts)}
               :event "LogAddBid"})
           "Add bid")
-      (is (= (-> (district-tasks/update-bid 0 1 "New bid title" "New bid description" {})
-                 (contract-event-in-tx :district-tasks :LogUpdateBid {})
+      (is (= (-> (district-tasks/remove-bid 0 2 {})
+                 (contract-event-in-tx :district-tasks :LogRemoveBid {})
                  (event->test))
              {:args {:task-id 0
-                     :bid-id 1
-                     :title "New bid title"
-                     :description "New bid description"}
-              :event "LogUpdateBid"})
-          "Update bid")
+                     :bid-id 2}
+              :event "LogRemoveBid"})
+          "Remove bid")
       (is (= (-> (district-tasks/add-voter 0 1 {})
                  (contract-event-in-tx :district-tasks :LogAddVoter {})
                  (event->test))

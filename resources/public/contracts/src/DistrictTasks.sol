@@ -46,11 +46,9 @@ contract DistrictTasks is Ownable {
         address indexed creator
     );
 
-    event LogUpdateBid(
+    event LogRemoveBid(
         uint taskId,
-        uint bidId,
-        string title,
-        string description
+        uint bidId
     );
 
     event LogAddVoter (
@@ -80,7 +78,7 @@ contract DistrictTasks is Ownable {
         _;
     }
 
-    // tasks
+    /// tasks
 
     function addTask(string _title, uint _biddingEndsOn, bool _isActive)
     public
@@ -119,7 +117,7 @@ contract DistrictTasks is Ownable {
         return tasks.length;
     }
 
-    // bids
+    /// bids
 
     function addBid(uint _taskId, string _title, string _description)
     public
@@ -133,12 +131,12 @@ contract DistrictTasks is Ownable {
         emit LogAddBid(_taskId, _bidId, _title, _description, msg.sender);
     }
 
-    function updateBid(uint _taskId, uint _bidId, string _title, string _description)
+    // We can't change indexes of the bids, because it will mess with events
+    function removeBid(uint _taskId, uint _bidId)
     public
-    onlyOwner
-    notEmptyString(_title)
-    notEmptyString(_description) {
-        emit LogUpdateBid(_taskId, _bidId, _title, _description);
+    onlyOwner {
+        delete tasks[_taskId].bids[_bidId];
+        emit LogRemoveBid(_taskId, _bidId);
     }
 
     function countBids(uint _taskId) public view returns (uint){
@@ -149,7 +147,7 @@ contract DistrictTasks is Ownable {
         return tasks[_taskId].bids[_bidId].creator;
     }
 
-    // voters
+    /// voters
 
     function addVoter(uint _taskId, uint _bidId)
     public
