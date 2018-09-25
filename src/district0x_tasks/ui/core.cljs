@@ -1,7 +1,6 @@
 (ns district0x-tasks.ui.core
   (:require
     [cljs.spec.alpha :as s]
-    [clojure.string :as str]
     [district.ui.component.router :refer [router]]
     [district.ui.graphql]
     [district.ui.notification]

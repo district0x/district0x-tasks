@@ -1,7 +1,6 @@
 (ns district0x-tasks.server.generator
   (:require
     [bignumber.core :as bn]
-    [cljs-ipfs-api.files :as ipfs-files]
     [cljs-web3.core :as web3]
     [cljs-web3.eth :as web3-eth]
     [cljs-web3.evm :as web3-evm]
