@@ -2,20 +2,12 @@
   (:require
    [district.ui.component.page :refer [page]]
    [district.ui.graphql.subs :as gql]
-   [district0x-tasks.ui.components.app-layout :refer [app-layout]]
+   [district0x-tasks.ui.components.app-layout :refer [layout]]
    [re-frame.core :refer [subscribe dispatch]]
    [reagent.core :as r]
    [react-infinite]
    [print.foo :refer [look] :include-macros true]
    [district0x-tasks.ui.utils :as utils]))
-
-(defn auctions-list [auctions]
-  [:div.tiles
-   (doall
-    (for [{:keys [:meme-auction/address] :as auc} auctions]
-      (let [title (-> auc :meme-auction/meme-token :meme-token/meme :meme/title)]
-        ^{:key address}
-        [tiles/auction-tile {:on-buy-click #()} auc])))])
 
 (def auction-node-graph [:meme-auction/address
                          :meme-auction/start-price
@@ -51,15 +43,16 @@
 
 (defmethod page :route/home []
   (let [search-atom (r/atom {:term ""})
-        new-on-market (subscribe [::gql/query {:queries [new-on-marketplace-query]}])
-        rare-finds (subscribe [::gql/query {:queries [rare-finds-query]}])
-        random-picks (subscribe [::gql/query {:queries [random-picks-query]}])] 
+        ;new-on-market (subscribe [::gql/query {:queries [new-on-marketplace-query]}])
+        ;rare-finds (subscribe [::gql/query {:queries [rare-finds-query]}])
+        ;random-picks (subscribe [::gql/query {:queries [random-picks-query]}])
+        ]
     (fn []
-      [app-layout
+      [layout
        {:meta {:title "district0x-tasks"
                :description "Description"}
         :search-atom search-atom}
-       [:div.home
+       #_[:div.home
         [:p.inspired "Inspired by the work of Simon de la Rouviere and his Curation Markets design, the third district to be deployed to dthe district0x."]
         [:section.meme-highlights
          [:div.new-on-marketplace
