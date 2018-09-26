@@ -42,7 +42,9 @@ contract DistrictTasks is Ownable {
         uint indexed taskId,
         uint indexed bidId,
         string title,
+        string url,
         string description,
+        uint amount,
         address indexed creator
     );
 
@@ -119,7 +121,9 @@ contract DistrictTasks is Ownable {
 
     /// bids
 
-    function addBid(uint _taskId, string _title, string _description)
+    // amount is decimal with 2 points, but Solidity doesn't have float
+    // (* amount 100) before add and (/ amount 100) after get from event
+    function addBid(uint _taskId, string _title, string _url, string _description, uint _amount)
     public
     activeTask(_taskId)
     validBiddingEndsOn(tasks[_taskId].biddingEndsOn)
@@ -128,7 +132,7 @@ contract DistrictTasks is Ownable {
     {
         uint _bidId = tasks[_taskId].bids.length++;
         tasks[_taskId].bids[_bidId].creator = msg.sender;
-        emit LogAddBid(_taskId, _bidId, _title, _description, msg.sender);
+        emit LogAddBid(_taskId, _bidId, _title, _url, _description, _amount, msg.sender);
     }
 
     // We can't change indexes of the bids, because it will mess with events

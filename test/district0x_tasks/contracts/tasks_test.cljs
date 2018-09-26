@@ -20,7 +20,7 @@
   (-> (district-tasks/event->cljs event)
       (select-keys [:args :event])))
 
-;; ganache-cli@6.1.8 block.timestamp is now instead of timestamp of last block
+;; Ganache CLI v6.1.8 (ganache-core: 2.2.1) block.timestamp is now instead of timestamp of last block
 (defn now-in-seconds []
   (-> (.getTime (js/Date.))
       (quot 1000)
@@ -62,11 +62,11 @@
               :active? true}))))
 
   (testing "Add / remove Bids to created tasks[0]"
-    (is (district-tasks/add-bid 0 "Bid title" "Bid description" {}))
+    (is (district-tasks/add-bid 0 "Bid title" "http://example.com" "Bid description" 0.01 {}))
     (is (= 1 (district-tasks/count-bids 0 {})))
     (is (= (district-tasks/get-bid 0 0 {})
            {:creator (first accounts)}))
-    (is (district-tasks/add-bid 0 "Remove me" "Remove me" {}))
+    (is (district-tasks/add-bid 0 "Remove me" "http://example.com" "Remove me" 123.45 {}))
     (is (district-tasks/remove-bid 0 1 {}))
     (is (= 2 (district-tasks/count-bids 0 {}))
         "Still count 2, because we can't change indexes of bids to not mess with events data")
@@ -88,7 +88,7 @@
     (testing "BiddingEndsOn, Active testing"
       (district-tasks/add-task "Title" bidding-ends-on false {})
       (is (thrown? js/Error
-                   (district-tasks/add-bid 2 "Bid title" "Bid description" {}))
+                   (district-tasks/add-bid 2 "Bid title" "http://example.com" "Bid description" 121.00 {}))
           "should not pass, because task is not active")
       (is (district-tasks/update-task 2 "Title" bidding-ends-on true {}))
       ;; temporary solution, because ganache-cli block.timestamp is now instead of last block timestamp
@@ -97,7 +97,7 @@
       ;(web3-evm/increase-time! @web3 [1])
       ;(web3-evm/mine! @web3)
       (is (thrown? js/Error
-                   (district-tasks/add-bid 2 "Bid title" "Bid description" {}))
+                   (district-tasks/add-bid 2 "Bid title" "https://example.org" "Bid description" 678.90 {}))
           "should not pass, because BiddingEndsOn expired")))
 
   (testing "events"
@@ -120,13 +120,15 @@
                      :bidding-ends-on bidding-ends-on}
               :event "LogUpdateTask"})
           "Update task")
-      (is (= (-> (district-tasks/add-bid 0 "Bid title" "Bid description" {})
+      (is (= (-> (district-tasks/add-bid 0 "Bid title" "http://foo.io" "Bid description" 12.34 {})
                  (contract-event-in-tx :district-tasks :LogAddBid {})
                  (event->test))
              {:args {:task-id 0
                      :bid-id 2
                      :title "Bid title"
+                     :url "http://foo.io"
                      :description "Bid description"
+                     :amount 12.34
                      :creator (first accounts)}
               :event "LogAddBid"})
           "Add bid")

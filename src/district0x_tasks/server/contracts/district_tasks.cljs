@@ -22,11 +22,13 @@
 
 ;;; bids
 
-(defn add-bid [task-id title description opts]
+(defn add-bid [task-id title url description amount opts]
   (contract-call :district-tasks :add-bid
                  task-id
                  title
+                 url
                  description
+                 (* amount 100)
                  opts))
 
 (defn remove-bid [task-id bid-id opts]
@@ -73,11 +75,15 @@
   (-> (update-in event [:args :task-id] bn/number)
       (update-in [:args :bid-id] bn/number)))
 
+(defn log-add-bid->cljs [event]
+  (-> (log-bid->cljs event)
+      (update-in [:args :amount] (comp bn/number #(/ % 100)))))
+
 (defn event->cljs [event]
   (let [convert (case (:event event)
                   "LogAddTask" log-task->cljs
                   "LogUpdateTask" log-task->cljs
-                  "LogAddBid" log-bid->cljs
+                  "LogAddBid" log-add-bid->cljs
                   "LogRemoveBid" log-bid->cljs
                   "LogAddVoter" log-bid->cljs)]
     (convert event)))
