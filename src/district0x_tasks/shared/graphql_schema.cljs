@@ -21,6 +21,7 @@
     bid_creator: String,
     bid_createdOn: Date,
     bid_title: String,
+    bid_url: String,
     bid_description: String,
     bid_amount: Float,
     bid_votesCount: Int

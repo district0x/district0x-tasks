@@ -10,79 +10,97 @@
     [taoensso.timbre :as logging :refer-macros [info warn error]]
     [medley.core :as medley]))
 
-(declare start)
-(declare stop)
-(defstate ^{:on-reload :noop} district0x-tasks-db
-          :start (start (merge (:district0x-tasks/db @config)
-                               (:district0x-tasks/db (mount/args))))
-          :stop (stop))
+(def tasks-columns
+  [[:task/id :unsigned :integer not-nil]
+   [:task/title :varchar not-nil]
+   [:task/active? :boolean not-nil]
+   [:task/bidding-ends-on :unsigned :integer not-nil]
+   [:task/created-at :unsigned :integer not-nil]])
 
-(def ipfs-hash (sql/call :char (sql/inline 46)))
+(def tasks-column-names (map first tasks-columns))
 
-(def registry-entries-columns
-  [[:reg-entry/address address primary-key not-nil]
-   [:reg-entry/version :unsigned :integer not-nil]
-   [:reg-entry/creator address not-nil]
-   [:reg-entry/deposit :unsigned :BIG :INT not-nil]
-   [:reg-entry/created-on :unsigned :integer not-nil]
-   [:reg-entry/challenge-period-end :unsigned :integer not-nil]
-   [:challenge/challenger address default-nil]
-   [:challenge/created-on :unsigned :integer default-nil]
-   [:challenge/voting-token address default-nil]
-   [:challenge/reward-pool :unsigned :BIG :INT default-nil]
-   [:challenge/meta-hash ipfs-hash default-nil]
-   [:challenge/comment :varchar default-nil]
-   [:challenge/commit-period-end :unsigned :integer default-nil]
-   [:challenge/reveal-period-end :unsigned :integer default-nil]
-   [:challenge/votes-for :BIG :INT default-nil]
-   [:challenge/votes-against :BIG :INT default-nil]
-   [:challenge/claimed-reward-on :unsigned :integer default-nil]])
+(def bids-columns
+  [[:task/id :unsigned :integer not-nil]
+   [:bid/id :unsigned :integer not-nil]
+   [:bid/creator address not-nil]
+   [:bid/title :varchar not-nil]
+   [:bid/url :varchar]
+   [:bid/description :text not-nil]
+   [:bid/amount :unsigned :float not-nil]
+   [:bid/votes-sum :unsigned :integer default-zero]
+   [:bid/created-at :unsigned :integer not-nil]])
 
-(def registry-entry-column-names (map first registry-entries-columns))
+(def bids-column-names (map first bids-columns))
 
-(defn- index-name [col-name]
-       (keyword (namespace col-name) (str (name col-name) "-index")))
+(def voters-columns
+  [[:task/id :unsigned :integer not-nil]
+   [:bid/id :unsigned :integer not-nil]
+   [:voter/address address not-nil]])
+
+(def voters-column-names (map first voters-columns))
 
 (defn start [opts]
-      (db/run! {:create-table [:reg-entries]
-                :with-columns [registry-entries-columns]})
-
-      )
-
+  (db/run! {:create-table [:tasks]
+            :with-columns [tasks-columns]})
+  (db/run! {:create-table [:bids]
+            :with-columns [bids-columns]})
+  (db/run! {:create-table [:voters]
+            :with-columns [voters-columns]}))
 
 (defn stop []
-      (db/run! {:drop-table [:reg-entries]})
-      )
+  (db/run! {:drop-table [:tasks]})
+  (db/run! {:drop-table [:bids]})
+  (db/run! {:drop-table [:voters]}))
+
+(defstate ^{:on-reload :noop} district0x-tasks-db
+  :start (start (merge (:district0x-tasks/db @config)
+                       (:district0x-tasks/db (mount/args))))
+  :stop (stop))
 
 (defn create-insert-fn [table-name column-names & [{:keys [:insert-or-replace?]}]]
-      (fn [item]
-          (let [item (select-keys item column-names)]
-               (db/run! {(if insert-or-replace? :insert-or-replace-into :insert-into) table-name
-                         :columns (keys item)
-                         :values [(vals item)]}))))
+  (fn [item]
+    (let [item (select-keys item column-names)]
+      (db/run! {(if insert-or-replace? :insert-or-replace-into :insert-into) table-name
+                :columns (keys item)
+                :values [(vals item)]}))))
 
 (defn create-update-fn [table-name column-names id-keys]
-      (fn [item]
-          (let [item (select-keys item column-names)
-                id-keys (if (sequential? id-keys) id-keys [id-keys])]
-               (db/run! {:update table-name
-                         :set item
-                         :where (concat
-                                  [:and]
-                                  (for [id-key id-keys]
-                                       [:= id-key (get item id-key)]))}))))
+  (fn [item]
+    (let [item (select-keys item column-names)
+          id-keys (if (sequential? id-keys) id-keys [id-keys])]
+      (db/run! {:update table-name
+                :set item
+                :where (concat
+                         [:and]
+                         (for [id-key id-keys]
+                           [:= id-key (get item id-key)]))}))))
 
 (defn create-get-fn [table-name id-keys]
-      (let [id-keys (if (sequential? id-keys) id-keys [id-keys])]
-           (fn [item fields]
-               (cond-> (db/get {:select (if (sequential? fields) fields [fields])
-                                :from [table-name]
-                                :where (concat
-                                         [:and]
-                                         (for [id-key id-keys]
-                                              [:= id-key (get item id-key)]))})
-                       (keyword? fields) fields))))
+  (let [id-keys (if (sequential? id-keys) id-keys [id-keys])]
+    (fn [item fields]
+      (cond-> (db/get {:select (if (sequential? fields) fields [fields])
+                       :from [table-name]
+                       :where (concat
+                                [:and]
+                                (for [id-key id-keys]
+                                  [:= id-key (get item id-key)]))})
+              (keyword? fields) fields))))
 
-(def insert-registry-entry! (create-insert-fn :reg-entries registry-entry-column-names))
-(def update-registry-entry! (create-update-fn :reg-entries registry-entry-column-names :reg-entry/address))
-(def get-registry-entry (create-get-fn :reg-entries :reg-entry/address))
+(def insert-task! (create-insert-fn :tasks tasks-column-names))
+(def update-task! (create-update-fn :tasks tasks-column-names :task/id))
+(defn task-item->edn [task-item]
+  (update task-item :task/active? #(= 1 %)))
+(def get-task (comp task-item->edn
+                    (create-get-fn :tasks :task/id)))
+
+(def insert-bid! (create-insert-fn :bids bids-column-names))
+(def update-bid! (create-update-fn :bids bids-column-names [:task/id :bid/id]))
+(def get-bid (create-get-fn :bids [:task/id :bid/id]))
+
+(def insert-voter! (create-insert-fn :voters voters-column-names))
+(defn get-voters [bid]
+  (let [task-id (:task/id bid)
+        bid-id (:bid/id bid)]
+    (db/all {:select [:*]
+             :from [:voters]
+             :where [:and [:= :task/id task-id] [:= :bid/id bid-id]]})))
