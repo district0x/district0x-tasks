@@ -67,4 +67,38 @@
            '({:task/id 123, :bid/id 111, :voter/address "0x71651917485a651bb9871d62b54507afcca6ca03"}
               {:task/id 123, :bid/id 111, :voter/address "0x71651917485a651bb9871d62b54507afcca11111"}))))
 
-  (district0x-tasks.server.dev/print-db))
+  (testing "SQL voters->tokens"
+    (is (= 1 (-> (db/upsert-voter->tokens! {:voter/address "0x71651917485a651bb9871d62b54507afcca6ca03"
+                                            :voter/tokens-amount 456})
+                 :changes)))
+    (is (= 1 (-> (db/upsert-voter->tokens! {:voter/address "0x71651917485a651bb9871d62b54507afcca6ca03"
+                                            :voter/tokens-amount 444})
+                 :changes)))
+    (is (= (db/get-voter->tokens {:voter/address "0x71651917485a651bb9871d62b54507afcca6ca03"} [:*])
+           {:voter/address "0x71651917485a651bb9871d62b54507afcca6ca03"
+            :voter/tokens-amount 444})))
+
+  (testing "SQL bid sum of tokens"
+    (db/insert-bid! {:task/id 124
+                     :bid/id 111
+                     :bid/creator "0x000000000000000000000000000000000creator"
+                     :bid/title "Sum"
+                     :bid/url "http://example.com/sum"
+                     :bid/description "Sum description"
+                     :bid/amount 477.77
+                     :bid/created-at 1514700000})
+    (db/insert-voter! {:task/id 124
+                       :bid/id 111
+                       :voter/address "0x0000000000000000000000000000000000000000"})
+    (db/insert-voter! {:task/id 124
+                       :bid/id 111
+                       :voter/address "0x0000000000000000000000000000000000000001"})
+    (db/upsert-voter->tokens! {:voter/address "0x0000000000000000000000000000000000000000"
+                               :voter/tokens-amount 100})
+    (db/upsert-voter->tokens! {:voter/address "0x0000000000000000000000000000000000000001"
+                               :voter/tokens-amount 50})
+    (is (= 150 (-> (db/sum-voters->tokens {:task/id 124
+                                           :bid/id 111})
+                   :sum))))
+
+  #_(district0x-tasks.server.dev/print-db))

@@ -39,18 +39,27 @@
 
 (def voters-column-names (map first voters-columns))
 
+(def voters->tokens-columns
+  [[:voter/address address not-nil]
+   [:voter/tokens-amount :unsigned :integer not-nil]])
+
+(def voters->tokens-column-names (map first voters->tokens-columns))
+
 (defn start [opts]
   (db/run! {:create-table [:tasks]
             :with-columns [tasks-columns]})
   (db/run! {:create-table [:bids]
             :with-columns [bids-columns]})
   (db/run! {:create-table [:voters]
-            :with-columns [voters-columns]}))
+            :with-columns [voters-columns]})
+  (db/run! {:create-table [:voters->tokens]
+            :with-columns [voters->tokens-columns]}))
 
 (defn stop []
   (db/run! {:drop-table [:tasks]})
   (db/run! {:drop-table [:bids]})
-  (db/run! {:drop-table [:voters]}))
+  (db/run! {:drop-table [:voters]})
+  (db/run! {:drop-table [:voters->tokens]}))
 
 (defstate ^{:on-reload :noop} district0x-tasks-db
   :start (start (merge (:district0x-tasks/db @config)
@@ -104,3 +113,18 @@
     (db/all {:select [:*]
              :from [:voters]
              :where [:and [:= :task/id task-id] [:= :bid/id bid-id]]})))
+
+(def insert-voter->tokens! (create-insert-fn :voters->tokens voters->tokens-column-names))
+(def update-voter->tokens! (create-update-fn :voters->tokens voters->tokens-column-names :voter/address))
+(def get-voter->tokens (create-get-fn :voters->tokens :voter/address))
+(defn upsert-voter->tokens! [voter->token]
+  (if (not-empty (get-voter->tokens voter->token [:*]))
+    (update-voter->tokens! voter->token)
+    (insert-voter->tokens! voter->token)))
+(defn sum-voters->tokens [bid]
+  (let [task-id (:task/id bid)
+        bid-id (:bid/id bid)]
+    (db/get {:select [[(sql/call :sum :v->t.voter/tokens-amount) :sum]] #_[:%sum.v->t.voter/tokens-amount]
+             :from [[:voters :v] [:voters->tokens :v->t]]
+             :where [:and [:= :v.task/id task-id] [:= :v.bid/id bid-id]
+                     [:= :v.voter/address :v->t.voter/address]]})))
