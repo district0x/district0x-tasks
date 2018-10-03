@@ -53,7 +53,8 @@
   (db/run! {:create-table [:voters]
             :with-columns [voters-columns]})
   (db/run! {:create-table [:voters->tokens]
-            :with-columns [voters->tokens-columns]}))
+            :with-columns [voters->tokens-columns]})
+  ::started)
 
 (defn stop []
   (db/run! {:drop-table [:tasks]})
@@ -101,10 +102,19 @@
   (update task-item :task/active? #(= 1 %)))
 (def get-task (comp task-item->edn
                     (create-get-fn :tasks :task/id)))
+(defn get-active-tasks []
+  (db/all {:select [:*]
+           :from [:tasks]
+           :where [:and [:= :task/active? true]]}))
 
 (def insert-bid! (create-insert-fn :bids bids-column-names))
 (def update-bid! (create-update-fn :bids bids-column-names [:task/id :bid/id]))
 (def get-bid (create-get-fn :bids [:task/id :bid/id]))
+(defn get-bids [bid]
+  (let [task-id (:task/id bid)]
+    (db/all {:select [:*]
+             :from [:bids]
+             :where [:= :task/id task-id]})))
 
 (def insert-voter! (create-insert-fn :voters voters-column-names))
 (defn get-voters [bid]
@@ -124,7 +134,7 @@
 (defn sum-voters->tokens [bid]
   (let [task-id (:task/id bid)
         bid-id (:bid/id bid)]
-    (db/get {:select [[(sql/call :sum :v->t.voter/tokens-amount) :sum]] #_[:%sum.v->t.voter/tokens-amount]
+    (db/get {:select [[(sql/call :sum :v->t.voter/tokens-amount) :sum]]
              :from [[:voters :v] [:voters->tokens :v->t]]
              :where [:and [:= :v.task/id task-id] [:= :v.bid/id bid-id]
                      [:= :v.voter/address :v->t.voter/address]]})))

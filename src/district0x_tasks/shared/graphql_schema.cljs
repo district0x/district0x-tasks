@@ -6,13 +6,15 @@
 
   type Query {
     activeTasks: [Task],
+    bids: [Bid]
   }
 
   type Task {
     task_id: ID,
     task_title: String,
-    task_active: Boolean,
+    task_isActive: Boolean,
     task_biddingEndsOn: Date,
+    task_createdAt: Date,
     task_bids: [Bid]
   }
 
@@ -24,6 +26,7 @@
     bid_url: String,
     bid_description: String,
     bid_amount: Float,
-    bid_votesCount: Int
+    bid_votesCount: Int,
+    bid_createdAt: Date
   }
 ")

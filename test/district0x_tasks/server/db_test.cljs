@@ -2,10 +2,13 @@
   (:require [cljs.test :refer-macros [deftest is testing run-tests use-fixtures async]]
             [district0x-tasks.server.dev :as dev]
             [district0x-tasks.server.deployer :as deployer]
-            [district0x-tasks.server.db :as db]))
+            [district0x-tasks.server.db :as db]
+            [cljs-web3.eth :as web3-eth]
+            [district.server.web3 :refer [web3]]))
 
 (dev/-main)
-(deployer/deploy-tasks-contract! {})
+(def accounts (web3-eth/accounts @web3))
+(deployer/deploy {:from (first accounts)})
 
 (deftest db-test
   (testing "SQL task"

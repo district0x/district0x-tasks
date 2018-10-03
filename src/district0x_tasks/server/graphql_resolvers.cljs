@@ -9,7 +9,8 @@
             [clojure.string :as str]
             [district.graphql-utils :as graphql-utils]
             [district.server.config :refer [config]]
-            [district.server.db :as db]
+            ;[district.server.db :as db]
+            [district0x-tasks.server.db :as db]
             [district.server.smart-contracts :as smart-contracts]
             [district.server.web3 :as web3]
             [honeysql.core :as sql]
@@ -19,53 +20,17 @@
             ;[district.shared.error-handling :refer [try-catch-throw]]
             ))
 
-;(def tasks-columns
-;  [[:task/id :unsigned :integer not-nil]
-;   [:task/title :varchar not-nil]
-;   [:task/active? :boolean not-nil]
-;   [:task/bidding-ends-on :unsigned :integer not-nil]
-;   [:task/created-at :unsigned :integer not-nil]])
-;
-;(def bids-columns
-;  [[:task/id :unsigned :integer not-nil]
-;   [:bid/id :unsigned :integer not-nil]
-;   [:bid/creator address not-nil]
-;   [:bid/title :varchar not-nil]
-;   [:bid/url :varchar]
-;   [:bid/description :text not-nil]
-;   [:bid/amount :unsigned :float not-nil]
-;   [:bid/created-at :unsigned :integer not-nil]])
-;
-;(def voters-columns
-;  [[:task/id :unsigned :integer not-nil]
-;   [:bid/id :unsigned :integer not-nil]
-;   [:voter/address address not-nil]])
-;
-;(def voters->tokens-columns
-;  [[:voter/address address not-nil]
-;   [:voter/tokens-amount :unsigned :integer not-nil]])
-;
+(defn active-tasks [_ _]
+  (db/get-active-tasks))
+
+(defn task->bids [_ task]
+  (db/get-bids task))
+
+(defn bid->votes-count [_ bid]
+  (db/sum-voters->tokens bid))
+
 (def resolvers-map
-  {}
-  ;{:Task {:task/id
-  ;        :task/title
-  ;        :task/active?
-  ;        :task/bidding-ends-on
-  ;        :task/created-at}
-  ; :Bid {:task/id
-  ;       :bid/id
-  ;       :bid/creator
-  ;       :bid/title
-  ;       :bid/url
-  ;       :bid/description
-  ;       :bid/amount
-  ;       :bid/created-at}
-  ; :_Task {:get
-  ;        :all
-  ;        :active
-  ;        :bidding-ends-on}
-  ; :_Bid {:task-bid-id
-  ;       :all-by-task
-  ;       }
-  ; }
-  )
+  {:Query {:active-tasks active-tasks
+           :bids task->bids}
+   :Task {:task/bids task->bids}
+   :Bid {:bid/votes-count bid->votes-count}})

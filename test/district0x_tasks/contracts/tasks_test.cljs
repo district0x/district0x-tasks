@@ -12,9 +12,9 @@
 (dev/-main)
 
 ;; {:from (first accounts)} is default account
-(deployer/deploy-tasks-contract! {})
-
 (def accounts (web3-eth/accounts @web3))
+
+(deployer/deploy {:from (first accounts)})
 
 (defn event->test [event]
   (-> (district-tasks/event->cljs event)
