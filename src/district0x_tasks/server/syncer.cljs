@@ -18,34 +18,44 @@
     [district0x-tasks.server.contracts.district-tasks :as district-tasks]
     [district.server.smart-contracts :refer [contract-call]]))
 
-(defmulti process-event (fn [contract-type ev]
-                          [contract-type (:event-type ev)]))
+(defmulti process-event #(:event %))
 
-(defmethod process-event :default [contract-type {:keys [:registry-entry :timestamp] :as ev}]
-  (println "###################!!!!!!##################")
-  (println (pr-str contract-type))
-  (println (pr-str ev)))
+(defmethod process-event :default [event]
+  (println "DefaultEvent" (pr-str event)))
 
-#_(defmethod process-event [:contract/param-change :constructed]
-  [contract-type {:keys [:registry-entry :timestamp] :as ev}]
-  #_(try-catch
-    (add-registry-entry registry-entry timestamp)
-    (add-param-change registry-entry)))
+(defmethod process-event "LogAddTask" [event]
+  (println "LogAddTask" (pr-str event)))
 
-(defn dispatch-event [contract-type err {:keys [args event] :as a}]
-  (let [event-type (cond
-                     (:event-type args) (cs/->kebab-case-keyword (web3-utils/bytes32->str (:event-type args)))
-                     event (cs/->kebab-case-keyword event))
-        ev (-> args
-               (assoc :contract-address (:address a))
-               (assoc :event-type event-type)
-               (update :timestamp bn/number)
-               (update :version bn/number))]
-    (log/info (str "Dispatching " contract-type " " event-type) {:ev ev} ::dispatch-event)
-    (process-event contract-type ev)))
+(defmethod process-event "LogUpdateTask" [event]
+  (println "LogUpdateTask" (pr-str event)))
+
+(defmethod process-event "LogAddBid" [event]
+  (println "LogAddBid" (pr-str event)))
+
+(defmethod process-event "LogRemoveBid" [event]
+  (println "LogRemoveBid" (pr-str event)))
+
+(defmethod process-event "LogAddVoter" [event]
+  (println "LogAddVoter" (pr-str event)))
+
+(defn dispatch-event [err event]
+  (let [event (district-tasks/event->cljs event)]
+    (log/info "Dispatching " event)
+    (process-event event)))
 
 (declare start)
 (declare stop)
+
+(def watchers [{:watcher [:district-tasks :LogAddTask]
+                :on-event dispatch-event}
+               {:watcher [:district-tasks :LogUpdateTask]
+                :on-event dispatch-event}
+               {:watcher [:district-tasks :LogAddBid]
+                :on-event dispatch-event}
+               {:watcher [:district-tasks :LogRemoveBid]
+                :on-event dispatch-event}
+               {:watcher [:district-tasks :LogAddVoter]
+                :on-event dispatch-event}])
 
 (defstate ^{:on-reload :noop} syncer
   :start (start (merge (:syncer @config)
@@ -60,36 +70,22 @@
     (throw (js/Error. "Database module has not started")))
 
   (let [last-block-number (web3-eth/block-number @web3)
-        ;watchers [{:watcher (partial eternal-db/change-applied-event [:param-change-registry-db])
-        ;           :on-event #(dispatch-event :contract/eternal-db %1 %2)}
-        ;          {:watcher (partial registry/registry-entry-event [:meme-registry :meme-registry-fwd])
-        ;           :on-event #(dispatch-event :contract/meme %1 %2)}
-        ;          {:watcher (partial registry/registry-entry-event [:param-change-registry :param-change-registry-fwd])
-        ;           :on-event #(dispatch-event :contract/param-change %1 %2)}
-        ;          {:watcher meme-auction-factory/meme-auction-event
-        ;           :on-event #(dispatch-event :contract/meme-auction %1 %2)}
-        ;          {:watcher meme-token/meme-token-transfer-event
-        ;           :on-event #(dispatch-event :contract/meme-token %1 %2)}]
-        watchers [{:watcher (fn [& args]
-                              (apply contract-call :district-tasks :LogAddTask args))
-                   :on-event (partial println :contract/add-task)}
-                  #_{:watcher (partial contract-call :district-tasks :LogAddTask)
-                   :on-event (partial dispatch-event :contract/add-task)
-                   #_(comp (partial dispatch-event :contract/add-task)
-                           district-tasks/event->cljs)}]]
+        watchers->contracts-call (->> watchers
+                                      (map (fn [m]
+                                             (update m :watcher #(apply partial contract-call %)))))]
     (concat
       ;; Replay every past events (from block 0 to (dec last-block-number))
       (when (pos? last-block-number)
-        (->> watchers
+        (->> watchers->contracts-call
              (map (fn [{:keys [watcher on-event]}]
-                    (-> (apply watcher [{} {:from-block 0 :to-block (dec last-block-number)}])
+                    (-> (watcher {} {:from-block 0 :to-block (dec last-block-number)})
                         (replay-past-events on-event))))
              (doall)))
 
       ;; Filters that will watch for last event and dispatch
-      (->> watchers
+      (->> watchers->contracts-call
            (map (fn [{:keys [watcher on-event]}]
-                  (apply watcher [{} "latest" on-event])))
+                  (watcher {} "latest" on-event)))
            (doall)))))
 
 (defn stop [syncer]
