@@ -63,7 +63,7 @@
                      :bid/description "Bid description"
                      :bid/amount 1
                      :bid/created-at 1514711111})
-    (is (= 1 (-> (db/remove-bid {:task/id 999
+    (is (= 1 (-> (db/remove-bid! {:task/id 999
                                  :bid/id 1})
                  :changes))))
 

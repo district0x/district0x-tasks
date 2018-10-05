@@ -16,31 +16,50 @@
     [cljs-ipfs-api.files :as ifiles]
     [print.foo :refer [look] :include-macros true]
     [district0x-tasks.server.contracts.district-tasks :as district-tasks]
-    [district.server.smart-contracts :refer [contract-call]]))
+    [district.server.smart-contracts :refer [contract-call]]
+    [clojure.set :refer [rename-keys]]))
 
 (defmulti process-event #(:event %))
 
-(defmethod process-event :default [event]
-  (println "DefaultEvent" (pr-str event)))
+(defmethod process-event "LogAddTask" [{:keys [args] :as event}]
+  (db/insert-task! {:task/id (:id args)
+                    :task/title (:title args)
+                    :task/bidding-ends-on (:bidding-ends-on args)
+                    :task/active? (:active? args)
+                    :task/created-at (:timestamp event)}))
 
-(defmethod process-event "LogAddTask" [event]
-  (println "LogAddTask" (pr-str event)))
+(defmethod process-event "LogUpdateTask" [{:keys [args] :as event}]
+  (db/update-task! {:task/id (:id args)
+                    :task/title (:title args)
+                    :task/bidding-ends-on (:bidding-ends-on args)
+                    :task/active? (:active? args)}))
 
-(defmethod process-event "LogUpdateTask" [event]
-  (println "LogUpdateTask" (pr-str event)))
+(defmethod process-event "LogAddBid" [{:keys [args] :as event}]
+  (db/insert-bid! {:task/id (:task-id args)
+                   :bid/id (:bid-id args)
+                   :bid/creator (:creator args)
+                   :bid/title (:title args)
+                   :bid/url (:url args)
+                   :bid/description (:description args)
+                   :bid/amount (:amount args)
+                   :bid/created-at (:timestamp event)}))
 
-(defmethod process-event "LogAddBid" [event]
-  (println "LogAddBid" (pr-str event)))
+(defmethod process-event "LogRemoveBid" [{:keys [args] :as event}]
+  (db/remove-bid! {:task/id (:task-id args)
+                   :bid/id (:bid-id args)}))
 
-(defmethod process-event "LogRemoveBid" [event]
-  (println "LogRemoveBid" (pr-str event)))
-
-(defmethod process-event "LogAddVoter" [event]
-  (println "LogAddVoter" (pr-str event)))
+(defmethod process-event "LogAddVoter" [{:keys [args] :as event}]
+  (db/insert-voter! {:task/id (:task-id args)
+                     :bid/id (:bid-id args)
+                     :voter/address (:voter args)}))
 
 (defn dispatch-event [err event]
-  (let [event (district-tasks/event->cljs event)]
-    (log/info "Dispatching " event)
+  (let [event (district-tasks/event->cljs event)
+        event (merge event
+                     (-> (web3-eth/get-block @web3 (:block-hash event) false)
+                         (select-keys [:number :timestamp])
+                         (rename-keys {:number :block-number})))]
+    (log/debug "Dispatching " event)
     (process-event event)))
 
 (declare start)

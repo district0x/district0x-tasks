@@ -34,30 +34,32 @@
       (inc)
       (+ 600)))
 
-(doseq [tx-hash [(district-tasks/add-task "Not active 0" feature-in-seconds false {})
-                 (district-tasks/add-task "Task 1" feature-in-seconds true {})
-                 (district-tasks/add-task "Task 2" feature-in-seconds true {})
-                 (district-tasks/add-task "Task 3" feature-in-seconds true {})]]
-  (contract->syncer tx-hash :district-tasks :LogAddTask))
+(deftest graphql-test
+  (doseq [tx-hash [(district-tasks/add-task "Not active 0" feature-in-seconds false {})
+                   (district-tasks/add-task "Task 1" feature-in-seconds true {})
+                   (district-tasks/add-task "Task 2" feature-in-seconds true {})
+                   (district-tasks/add-task "Task 3" feature-in-seconds true {})]]
+    (contract->syncer tx-hash :district-tasks :LogAddTask))
 
-(doseq [tx-hash [(district-tasks/add-bid 1 "Bid 1.0" "http://example.com/" "Bid description" 0.01 {})
-                 (district-tasks/add-bid 1 "Bid 1.1" "http://example.com/" "Bid description" 0.08 {})
-                 (district-tasks/add-bid 2 "Bid 2.1" "http://example.com/" "Bid description" 1.32 {})
-                 (district-tasks/add-bid 3 "Bid 3.0" "http://example.com/" "Bid description" 278 {})
-                 (district-tasks/add-bid 3 "Bid 3.1" "http://example.com/" "Bid description" 254 {})
-                 (district-tasks/add-bid 3 "Bid 3.2" "http://example.com/" "Bid description" 289.35 {})]]
-  (contract->syncer tx-hash :district-tasks :LogAddBid))
+  (doseq [tx-hash [(district-tasks/add-bid 1 "Bid 1.0" "http://example.com/" "Bid description" 0.01 {})
+                   (district-tasks/add-bid 1 "Bid 1.1" "http://example.com/" "Bid description" 0.08 {})
+                   (district-tasks/add-bid 2 "Bid 2.1" "http://example.com/" "Bid description" 1.32 {})
+                   (district-tasks/add-bid 3 "Bid 3.0" "http://example.com/" "Bid description" 278 {})
+                   (district-tasks/add-bid 3 "Bid 3.1" "http://example.com/" "Bid description" 254 {})
+                   (district-tasks/add-bid 3 "Bid 3.2" "http://example.com/" "Bid description" 289.35 {})]]
+    (contract->syncer tx-hash :district-tasks :LogAddBid))
 
-(doseq [tx-hash [(district-tasks/add-voter 1 0 {:from (nth accounts 0)})
-                 (district-tasks/add-voter 1 0 {:from (nth accounts 1)})
-                 (district-tasks/add-voter 1 1 {:from (nth accounts 0)})
-                 (district-tasks/add-voter 3 2 {:from (nth accounts 0)})
-                 (district-tasks/add-voter 3 2 {:from (nth accounts 1)})
-                 (district-tasks/add-voter 3 2 {:from (nth accounts 2)})
-                 (district-tasks/add-voter 3 2 {:from (nth accounts 3)})]]
-  (contract->syncer tx-hash :district-tasks :LogAddVoter))
+  (doseq [tx-hash [(district-tasks/add-voter 1 0 {:from (nth accounts 0)})
+                   (district-tasks/add-voter 1 0 {:from (nth accounts 1)})
+                   (district-tasks/add-voter 1 1 {:from (nth accounts 0)})
+                   (district-tasks/add-voter 3 2 {:from (nth accounts 0)})
+                   (district-tasks/add-voter 3 2 {:from (nth accounts 1)})
+                   (district-tasks/add-voter 3 2 {:from (nth accounts 2)})
+                   (district-tasks/add-voter 3 2 {:from (nth accounts 3)})]]
+    (contract->syncer tx-hash :district-tasks :LogAddVoter))
 
-(dev/print-db)
+  (dev/print-db)
+  )
 
 #_(println (pr-str (graphql/run-query
                      {:queries [[:active-tasks
@@ -65,12 +67,3 @@
                                   [:task/bids [:bid/id]]]]]})))
 
 ;(println (pr-str (graphql/run-query "{activeTasks {task_id, task_title}}")))
-
-;{:args {:task-id 3, :bid-id 2, :voter "0x460b73a8392971ddc4d4d2846879d15a0dbb3831"},
-; :address "0x6ba23165568208f6b99ed3ffed2773f4a7f29a6d",
-; :log-index 0,
-; :transaction-index 0,
-; :block-hash "0x92fd90a9cc365804767321a5767946b3a9ad2bd2edcc08c63faa9b3720a3b6c8",
-; :type "mined", :block-number 0,
-; :transaction-hash "0x6764aa1de5568edeebf5a5b0142e10c7c54204384518565257bcc6baf2c9721c",
-; :event "LogAddVoter"}
