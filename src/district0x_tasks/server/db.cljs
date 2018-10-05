@@ -54,6 +54,14 @@
             :with-columns [voters-columns]})
   (db/run! {:create-table [:voters->tokens]
             :with-columns [voters->tokens-columns]})
+  (-> (sql/raw "CREATE UNIQUE INDEX tasks_index ON tasks (task_SLASH_id)")
+      (db/run!))
+  (-> (sql/raw "CREATE UNIQUE INDEX bids_index ON bids (task_SLASH_id, bid_SLASH_id)")
+      (db/run!))
+  (-> (sql/raw "CREATE UNIQUE INDEX voters_index ON voters (task_SLASH_id, bid_SLASH_id, voter_SLASH_address)")
+      (db/run!))
+  (-> (sql/raw "CREATE UNIQUE INDEX voters_tokens_index ON voters__GT_tokens (voter_SLASH_address)")
+      (db/run!))
   ::started)
 
 (defn stop []
