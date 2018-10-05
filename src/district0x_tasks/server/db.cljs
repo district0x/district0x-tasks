@@ -115,6 +115,11 @@
     (db/all {:select [:*]
              :from [:bids]
              :where [:= :task/id task-id]})))
+(defn remove-bid [bid]
+  (let [task-id (:task/id bid)
+        bid-id (:bid/id bid)]
+    (db/run! {:delete-from :bids
+              :where [:and [:= :task/id task-id] [:= :bid/id bid-id]]})))
 
 (def insert-voter! (create-insert-fn :voters voters-column-names))
 (defn get-voters [bid]

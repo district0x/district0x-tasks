@@ -54,7 +54,18 @@
             :bid/description "Bid description"
             :bid/amount 243.65
             :bid/votes-sum 789
-            :bid/created-at 1514711111})))
+            :bid/created-at 1514711111}))
+    (db/insert-bid! {:task/id 999
+                     :bid/id 1
+                     :bid/creator "0x46E286cb00c5e7D5949D18e767447E513d001BBA"
+                     :bid/title "remove bid"
+                     :bid/url "http://example.com"
+                     :bid/description "Bid description"
+                     :bid/amount 1
+                     :bid/created-at 1514711111})
+    (is (= 1 (-> (db/remove-bid {:task/id 999
+                                 :bid/id 1})
+                 :changes))))
 
   (testing "SQL voters"
     (is (= 1 (-> (db/insert-voter! {:task/id 123
