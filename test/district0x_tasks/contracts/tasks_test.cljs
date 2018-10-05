@@ -107,7 +107,7 @@
                  (event->test))
              {:args {:id 3
                      :title "Event test"
-                     :is-active false
+                     :active? false
                      :bidding-ends-on bidding-ends-on}
               :event "LogAddTask"})
           "Add task")
@@ -116,7 +116,7 @@
                  (event->test))
              {:args {:id 0
                      :title "New title"
-                     :is-active true
+                     :active? true
                      :bidding-ends-on bidding-ends-on}
               :event "LogUpdateTask"})
           "Update task")

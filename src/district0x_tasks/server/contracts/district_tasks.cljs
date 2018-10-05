@@ -1,6 +1,7 @@
 (ns district0x-tasks.server.contracts.district-tasks
   (:require [district.server.smart-contracts :refer [contract-call]]
-            [bignumber.core :as bn]))
+            [bignumber.core :as bn]
+            [clojure.set :refer [rename-keys]]))
 
 ;;; tasks
 
@@ -68,7 +69,8 @@
 ;;; events
 
 (defn log-task->cljs [event]
-  (-> (update-in event [:args :id] bn/number)
+  (-> (update event :args #(rename-keys % {:is-active :active?}))
+      (update-in [:args :id] bn/number)
       (update-in [:args :bidding-ends-on] bn/number)))
 
 (defn log-bid->cljs [event]
