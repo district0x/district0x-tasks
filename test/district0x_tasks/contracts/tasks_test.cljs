@@ -80,7 +80,7 @@
     (is (= (district-tasks/get-voters 0 0 {})
            [(first accounts)])))
 
-  (let [bidding-ends-on (+ (now-in-seconds) 1)]
+  (let [bidding-ends-on (+ (now-in-seconds) 2)]
     (testing "BiddingEndsOn, Active testing"
       (district-tasks/add-task "Title" bidding-ends-on false {})
       (is (thrown? js/Error
@@ -88,7 +88,7 @@
           "should not pass, because task is not active")
       (is (district-tasks/update-task 2 "Title" bidding-ends-on true {}))
       ;; temporary solution, because ganache-cli block.timestamp is now instead of last block timestamp
-      (sleep 1)
+      (sleep 2)
       ;; when block.timestamp will became last block timestamp
       ;(web3-evm/increase-time! @web3 [1])
       ;(web3-evm/mine! @web3)

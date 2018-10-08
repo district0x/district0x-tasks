@@ -59,7 +59,7 @@
                    (district-tasks/add-voter 3 2 {:from (nth accounts 0)})
                    (district-tasks/add-voter 3 2 {:from (nth accounts 1)})
                    (district-tasks/add-voter 3 2 {:from (nth accounts 2)})
-                   (district-tasks/add-voter 3 2 {:from (nth accounts 4)})]]
+                   (district-tasks/add-voter 3 2 {:from (nth accounts 3)})]]
     (contract->syncer tx-hash :district-tasks :LogAddVoter))
 
   (db/upsert-voter->tokens! {:voter/address (nth accounts 0)
@@ -68,7 +68,7 @@
                              :voter/tokens-amount 100})
   (db/upsert-voter->tokens! {:voter/address (nth accounts 2)
                              :voter/tokens-amount 200})
-  (db/upsert-voter->tokens! {:voter/address (nth accounts 4)
+  (db/upsert-voter->tokens! {:voter/address (nth accounts 3)
                              :voter/tokens-amount 300})
 
   ;(dev/print-db)
