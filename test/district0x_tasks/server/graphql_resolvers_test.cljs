@@ -9,14 +9,10 @@
             [district.server.web3 :refer [web3]]
             [cljs-web3.eth :as web3-eth]
             [district.server.smart-contracts :refer [replay-past-events contract-event-in-tx contract-call]]
-            [district0x-tasks.server.syncer :as syncer]))
+            [district0x-tasks.server.syncer :as syncer]
+            [district0x-tasks.utils :as utils :refer [accounts]]))
 
-(dev/-main)
-
-(def accounts (web3-eth/accounts @web3))
-
-(deployer/deploy {:from (first accounts)})
-(dev/resync)
+(use-fixtures :once utils/prepare-contracts)
 
 (def watchers
   (->> syncer/watchers
@@ -35,35 +31,75 @@
       (+ 600)))
 
 (deftest graphql-test
-  (doseq [tx-hash [(district-tasks/add-task "Not active 0" feature-in-seconds false {})
+  (doseq [tx-hash [(district-tasks/add-task "Active 0" feature-in-seconds true {})
                    (district-tasks/add-task "Task 1" feature-in-seconds true {})
                    (district-tasks/add-task "Task 2" feature-in-seconds true {})
                    (district-tasks/add-task "Task 3" feature-in-seconds true {})]]
     (contract->syncer tx-hash :district-tasks :LogAddTask))
 
-  (doseq [tx-hash [(district-tasks/add-bid 1 "Bid 1.0" "http://example.com/" "Bid description" 0.01 {})
-                   (district-tasks/add-bid 1 "Bid 1.1" "http://example.com/" "Bid description" 0.08 {})
+  (-> (district-tasks/update-task 0 "Not active 0" feature-in-seconds false {})
+      (contract->syncer :district-tasks :LogUpdateTask))
+
+  (doseq [tx-hash [(district-tasks/add-bid 1 "Bid 1.0" "http://example.com/" "Bid to remove" 0.01 {})
+                   (district-tasks/add-bid 1 "Bid 1.1" "http://example.com/" "Bid description" 0.11 {})
+                   (district-tasks/add-bid 1 "Bid 1.2" "http://example.com/" "Bid description" 0.12 {})
                    (district-tasks/add-bid 2 "Bid 2.1" "http://example.com/" "Bid description" 1.32 {})
                    (district-tasks/add-bid 3 "Bid 3.0" "http://example.com/" "Bid description" 278 {})
                    (district-tasks/add-bid 3 "Bid 3.1" "http://example.com/" "Bid description" 254 {})
                    (district-tasks/add-bid 3 "Bid 3.2" "http://example.com/" "Bid description" 289.35 {})]]
     (contract->syncer tx-hash :district-tasks :LogAddBid))
 
-  (doseq [tx-hash [(district-tasks/add-voter 1 0 {:from (nth accounts 0)})
-                   (district-tasks/add-voter 1 0 {:from (nth accounts 1)})
-                   (district-tasks/add-voter 1 1 {:from (nth accounts 0)})
+  (-> (district-tasks/remove-bid 1 0 {})
+      (contract->syncer :district-tasks :LogRemoveBid))
+
+  (doseq [tx-hash [(district-tasks/add-voter 1 1 {:from (nth accounts 0)})
+                   (district-tasks/add-voter 1 1 {:from (nth accounts 1)})
+                   (district-tasks/add-voter 1 2 {:from (nth accounts 0)})
                    (district-tasks/add-voter 3 2 {:from (nth accounts 0)})
                    (district-tasks/add-voter 3 2 {:from (nth accounts 1)})
                    (district-tasks/add-voter 3 2 {:from (nth accounts 2)})
                    (district-tasks/add-voter 3 2 {:from (nth accounts 3)})]]
     (contract->syncer tx-hash :district-tasks :LogAddVoter))
 
-  (dev/print-db)
-  )
+  (db/upsert-voter->tokens! {:voter/address (nth accounts 0)
+                             :voter/tokens-amount 10})
+  (db/upsert-voter->tokens! {:voter/address (nth accounts 1)
+                             :voter/tokens-amount 100})
+  (db/upsert-voter->tokens! {:voter/address (nth accounts 2)
+                             :voter/tokens-amount 200})
+  (db/upsert-voter->tokens! {:voter/address (nth accounts 3)
+                             :voter/tokens-amount 300})
 
-#_(println (pr-str (graphql/run-query
-                     {:queries [[:active-tasks
-                                 [:task/id :task/title
-                                  [:task/bids [:bid/id]]]]]})))
+  ;(dev/print-db)
 
-;(println (pr-str (graphql/run-query "{activeTasks {task_id, task_title}}")))
+  (is (= (->> (graphql/run-query
+                {:queries [[:active-tasks
+                            [:task/id :task/title :task/is-active :task/bidding-ends-on
+                             [:task/bids [:bid/id :bid/creator :bid/title :bid/url :bid/description :bid/amount :bid/votes-sum]]]]]})
+              :data
+              :active-tasks)
+
+         [{:task/id "1" :task/title "Task 1" :task/is-active true :task/bidding-ends-on feature-in-seconds
+           :task/bids [{:bid/id "1" :bid/creator "0x8507d8084af76c67df28a452a802a33297562d73" :bid/title "Bid 1.1" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 0.11 :bid/votes-sum 110}
+                       {:bid/id "2" :bid/creator "0x8507d8084af76c67df28a452a802a33297562d73" :bid/title "Bid 1.2" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 0.12 :bid/votes-sum 10}]}
+          {:task/id "2" :task/title "Task 2" :task/is-active true :task/bidding-ends-on feature-in-seconds
+           :task/bids [{:bid/id "0" :bid/creator "0x8507d8084af76c67df28a452a802a33297562d73" :bid/title "Bid 2.1" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 1.32 :bid/votes-sum 0}]}
+          {:task/id "3" :task/title "Task 3" :task/is-active true :task/bidding-ends-on feature-in-seconds
+           :task/bids [{:bid/id "0" :bid/creator "0x8507d8084af76c67df28a452a802a33297562d73" :bid/title "Bid 3.0" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 278 :bid/votes-sum 0}
+                       {:bid/id "1" :bid/creator "0x8507d8084af76c67df28a452a802a33297562d73" :bid/title "Bid 3.1" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 254 :bid/votes-sum 0}
+                       {:bid/id "2" :bid/creator "0x8507d8084af76c67df28a452a802a33297562d73" :bid/title "Bid 3.2" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 289.35 :bid/votes-sum 610}]}])
+      "active-tasks")
+
+  (is (->> (graphql/run-query
+             {:queries [[:active-tasks [:task/created-at]]]})
+           :data
+           :active-tasks
+           (every? :task/created-at))
+      "task/created-at")
+
+  (is (->> (graphql/run-query
+             {:queries [[:bids {:task/id 1} [:bid/created-at]]]})
+           :data
+           :bids
+           (every? :bid/created-at))
+      "bid/created-at"))

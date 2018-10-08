@@ -4,11 +4,10 @@
             [district0x-tasks.server.deployer :as deployer]
             [district0x-tasks.server.db :as db]
             [cljs-web3.eth :as web3-eth]
-            [district.server.web3 :refer [web3]]))
+            [district.server.web3 :refer [web3]]
+            [district0x-tasks.utils :as utils :refer [accounts]]))
 
-(dev/-main)
-(def accounts (web3-eth/accounts @web3))
-(deployer/deploy {:from (first accounts)})
+(use-fixtures :once utils/prepare-contracts)
 
 (deftest db-test
   (testing "SQL task"
@@ -64,7 +63,7 @@
                      :bid/amount 1
                      :bid/created-at 1514711111})
     (is (= 1 (-> (db/remove-bid! {:task/id 999
-                                 :bid/id 1})
+                                  :bid/id 1})
                  :changes))))
 
   (testing "SQL voters"
@@ -78,8 +77,8 @@
                  :changes)))
     (is (= (db/get-voters {:task/id 123
                            :bid/id 111})
-           '({:task/id 123, :bid/id 111, :voter/address "0x71651917485a651bb9871d62b54507afcca6ca03"}
-              {:task/id 123, :bid/id 111, :voter/address "0x71651917485a651bb9871d62b54507afcca11111"}))))
+           '({:task/id 123, :bid/id 111, :voter/address "0x71651917485a651bb9871d62b54507afcca11111"}
+              {:task/id 123, :bid/id 111, :voter/address "0x71651917485a651bb9871d62b54507afcca6ca03"}))))
 
   (testing "SQL voters->tokens"
     (is (= 1 (-> (db/upsert-voter->tokens! {:voter/address "0x71651917485a651bb9871d62b54507afcca6ca03"
@@ -111,8 +110,7 @@
                                :voter/tokens-amount 100})
     (db/upsert-voter->tokens! {:voter/address "0x0000000000000000000000000000000000000001"
                                :voter/tokens-amount 50})
-    (is (= 150 (-> (db/sum-voters->tokens {:task/id 124
-                                           :bid/id 111})
-                   :sum))))
+    (is (= 150 (db/sum-voters->tokens {:task/id 124
+                                       :bid/id 111}))))
 
   #_(district0x-tasks.server.dev/print-db))

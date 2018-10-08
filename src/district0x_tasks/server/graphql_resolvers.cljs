@@ -9,7 +9,6 @@
             [clojure.string :as str]
             [district.graphql-utils :as graphql-utils]
             [district.server.config :refer [config]]
-            ;[district.server.db :as db]
             [district0x-tasks.server.db :as db]
             [district.server.smart-contracts :as smart-contracts]
             [district.server.web3 :as web3]
@@ -17,20 +16,20 @@
             [honeysql.helpers :as sqlh]
             [print.foo :refer [look] :include-macros true]
             [taoensso.timbre :as log]
-            ;[district.shared.error-handling :refer [try-catch-throw]]
-            ))
+            [clojure.set :refer [rename-keys]]))
 
-(defn active-tasks [_ _]
+(defn active-tasks [_]
   (db/get-active-tasks))
 
-(defn task->bids [_ task]
+(defn task->bids [task]
   (db/get-bids task))
 
-(defn bid->votes-count [_ bid]
+(defn bid->votes-aum [bid]
   (db/sum-voters->tokens bid))
 
 (def resolvers-map
   {:Query {:active-tasks active-tasks
-           :bids task->bids}
-   :Task {:task/bids task->bids}
-   :Bid {:bid/votes-count bid->votes-count}})
+           :bids #(task->bids %2)}
+   :Task {:task/bids task->bids
+          :task/is-active #(:task/active? %)}
+   :Bid {:bid/votes-sum bid->votes-aum}})

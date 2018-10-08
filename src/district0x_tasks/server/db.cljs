@@ -122,7 +122,8 @@
   (let [task-id (:task/id bid)]
     (db/all {:select [:*]
              :from [:bids]
-             :where [:= :task/id task-id]})))
+             :where [:= :task/id task-id]
+             :order-by [:created-at :desc]})))
 (defn remove-bid! [bid]
   (let [task-id (:task/id bid)
         bid-id (:bid/id bid)]
@@ -147,7 +148,9 @@
 (defn sum-voters->tokens [bid]
   (let [task-id (:task/id bid)
         bid-id (:bid/id bid)]
-    (db/get {:select [[(sql/call :sum :v->t.voter/tokens-amount) :sum]]
-             :from [[:voters :v] [:voters->tokens :v->t]]
-             :where [:and [:= :v.task/id task-id] [:= :v.bid/id bid-id]
-                     [:= :v.voter/address :v->t.voter/address]]})))
+    (-> (db/get {:select [[(sql/call :sum :v->t.voter/tokens-amount) :sum]]
+                 :from [[:voters :v] [:voters->tokens :v->t]]
+                 :where [:and [:= :v.task/id task-id] [:= :v.bid/id bid-id]
+                         [:= :v.voter/address :v->t.voter/address]]})
+        :sum
+        (or 0))))

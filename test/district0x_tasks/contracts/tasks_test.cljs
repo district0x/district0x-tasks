@@ -7,14 +7,10 @@
             [district0x-tasks.server.dev :as dev]
             [district0x-tasks.server.deployer :as deployer]
             [district0x-tasks.server.contracts.district-tasks :as district-tasks]
-            [district.server.smart-contracts :refer [replay-past-events contract-event-in-tx]]))
+            [district.server.smart-contracts :refer [replay-past-events contract-event-in-tx]]
+            [district0x-tasks.utils :as utils :refer [accounts]]))
 
-(dev/-main)
-
-;; {:from (first accounts)} is default account
-(def accounts (web3-eth/accounts @web3))
-
-(deployer/deploy {:from (first accounts)})
+(use-fixtures :once utils/prepare-contracts)
 
 (defn event->test [event]
   (-> (district-tasks/event->cljs event)

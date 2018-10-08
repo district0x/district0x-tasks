@@ -6,7 +6,7 @@
 
   type Query {
     activeTasks: [Task],
-    bids: [Bid]
+    bids(task_id: ID!): [Bid]
   }
 
   type Task {
@@ -21,12 +21,11 @@
   type Bid {
     bid_id: ID,
     bid_creator: String,
-    bid_createdOn: Date,
     bid_title: String,
     bid_url: String,
     bid_description: String,
     bid_amount: Float,
-    bid_votesCount: Int,
+    bid_votesSum: Int,
     bid_createdAt: Date
   }
 ")
