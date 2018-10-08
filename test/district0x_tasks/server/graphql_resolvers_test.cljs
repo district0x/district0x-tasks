@@ -41,7 +41,7 @@
       (contract->syncer :district-tasks :LogUpdateTask))
 
   (doseq [tx-hash [(district-tasks/add-bid 1 "Bid 1.0" "http://example.com/" "Bid to remove" 0.01 {})
-                   (district-tasks/add-bid 1 "Bid 1.1" "http://example.com/" "Bid description" 0.11 {})
+                   (district-tasks/add-bid 1 "Bid 1.1" "http://example.com/" "Bid description" 0.11 {:from (second accounts)})
                    (district-tasks/add-bid 1 "Bid 1.2" "http://example.com/" "Bid description" 0.12 {})
                    (district-tasks/add-bid 2 "Bid 2.1" "http://example.com/" "Bid description" 1.32 {})
                    (district-tasks/add-bid 3 "Bid 3.0" "http://example.com/" "Bid description" 278 {})
@@ -52,13 +52,14 @@
   (-> (district-tasks/remove-bid 1 0 {})
       (contract->syncer :district-tasks :LogRemoveBid))
 
+
   (doseq [tx-hash [(district-tasks/add-voter 1 1 {:from (nth accounts 0)})
                    (district-tasks/add-voter 1 1 {:from (nth accounts 1)})
                    (district-tasks/add-voter 1 2 {:from (nth accounts 0)})
                    (district-tasks/add-voter 3 2 {:from (nth accounts 0)})
                    (district-tasks/add-voter 3 2 {:from (nth accounts 1)})
                    (district-tasks/add-voter 3 2 {:from (nth accounts 2)})
-                   (district-tasks/add-voter 3 2 {:from (nth accounts 3)})]]
+                   (district-tasks/add-voter 3 2 {:from (nth accounts 4)})]]
     (contract->syncer tx-hash :district-tasks :LogAddVoter))
 
   (db/upsert-voter->tokens! {:voter/address (nth accounts 0)
@@ -67,7 +68,7 @@
                              :voter/tokens-amount 100})
   (db/upsert-voter->tokens! {:voter/address (nth accounts 2)
                              :voter/tokens-amount 200})
-  (db/upsert-voter->tokens! {:voter/address (nth accounts 3)
+  (db/upsert-voter->tokens! {:voter/address (nth accounts 4)
                              :voter/tokens-amount 300})
 
   ;(dev/print-db)
@@ -78,16 +79,15 @@
                              [:task/bids [:bid/id :bid/creator :bid/title :bid/url :bid/description :bid/amount :bid/votes-sum]]]]]})
               :data
               :active-tasks)
-
          [{:task/id "1" :task/title "Task 1" :task/is-active true :task/bidding-ends-on feature-in-seconds
-           :task/bids [{:bid/id "1" :bid/creator "0x8507d8084af76c67df28a452a802a33297562d73" :bid/title "Bid 1.1" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 0.11 :bid/votes-sum 110}
-                       {:bid/id "2" :bid/creator "0x8507d8084af76c67df28a452a802a33297562d73" :bid/title "Bid 1.2" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 0.12 :bid/votes-sum 10}]}
+           :task/bids [{:bid/id "1" :bid/creator (second accounts) :bid/title "Bid 1.1" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 0.11 :bid/votes-sum 110}
+                       {:bid/id "2" :bid/creator (first accounts) :bid/title "Bid 1.2" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 0.12 :bid/votes-sum 10}]}
           {:task/id "2" :task/title "Task 2" :task/is-active true :task/bidding-ends-on feature-in-seconds
-           :task/bids [{:bid/id "0" :bid/creator "0x8507d8084af76c67df28a452a802a33297562d73" :bid/title "Bid 2.1" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 1.32 :bid/votes-sum 0}]}
+           :task/bids [{:bid/id "0" :bid/creator (first accounts) :bid/title "Bid 2.1" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 1.32 :bid/votes-sum 0}]}
           {:task/id "3" :task/title "Task 3" :task/is-active true :task/bidding-ends-on feature-in-seconds
-           :task/bids [{:bid/id "0" :bid/creator "0x8507d8084af76c67df28a452a802a33297562d73" :bid/title "Bid 3.0" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 278 :bid/votes-sum 0}
-                       {:bid/id "1" :bid/creator "0x8507d8084af76c67df28a452a802a33297562d73" :bid/title "Bid 3.1" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 254 :bid/votes-sum 0}
-                       {:bid/id "2" :bid/creator "0x8507d8084af76c67df28a452a802a33297562d73" :bid/title "Bid 3.2" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 289.35 :bid/votes-sum 610}]}])
+           :task/bids [{:bid/id "0" :bid/creator (first accounts) :bid/title "Bid 3.0" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 278 :bid/votes-sum 0}
+                       {:bid/id "1" :bid/creator (first accounts) :bid/title "Bid 3.1" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 254 :bid/votes-sum 0}
+                       {:bid/id "2" :bid/creator (first accounts) :bid/title "Bid 3.2" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 289.35 :bid/votes-sum 610}]}])
       "active-tasks")
 
   (is (->> (graphql/run-query

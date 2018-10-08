@@ -118,12 +118,11 @@
 (def insert-bid! (create-insert-fn :bids bids-column-names))
 (def update-bid! (create-update-fn :bids bids-column-names [:task/id :bid/id]))
 (def get-bid (create-get-fn :bids [:task/id :bid/id]))
-(defn get-bids [bid]
-  (let [task-id (:task/id bid)]
+(defn get-bids [task]
+  (let [task-id (:task/id task)]
     (db/all {:select [:*]
              :from [:bids]
-             :where [:= :task/id task-id]
-             :order-by [:created-at :desc]})))
+             :where [:= :task/id task-id]})))
 (defn remove-bid! [bid]
   (let [task-id (:task/id bid)
         bid-id (:bid/id bid)]
