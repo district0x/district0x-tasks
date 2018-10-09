@@ -26,4 +26,5 @@ pom.xml.asc
 district0x-tasks-tests/
 /browser-tests/
 /smart-contracts-tests/
-resources/public/js/
+/resources/public/js/
+/resources/public/contracts/build
