@@ -54,10 +54,10 @@
       (contract->syncer :district-tasks :LogRemoveBid))
 
   ;; prepare tokens, no events for this, just call contract
-  (mini-me-token/generate-tokens (nth accounts 0) 10 {:gas 130000})
-  (mini-me-token/generate-tokens (nth accounts 1) 100 {:gas 130000})
-  (mini-me-token/generate-tokens (nth accounts 2) 200 {:gas 130000})
-  (mini-me-token/generate-tokens (nth accounts 4) 300 {:gas 130000})
+  (mini-me-token/generate-tokens (nth accounts 0) 110 {:gas 130000})
+  (mini-me-token/generate-tokens (nth accounts 1) 150 {:gas 130000})
+  (mini-me-token/generate-tokens (nth accounts 2) 150 {:gas 130000})
+  (mini-me-token/generate-tokens (nth accounts 4) 200 {:gas 130000})
 
   (doseq [tx-hash [(district-tasks/add-voter 1 1 {:from (nth accounts 0)})
                    (district-tasks/add-voter 1 1 {:from (nth accounts 1)})
@@ -68,9 +68,10 @@
                    (district-tasks/add-voter 3 2 {:from (nth accounts 4)})]]
     (contract->syncer tx-hash :district-tasks :LogAddVoter))
 
-  ;; todo token transfer events here instead
-
-
+  (mini-me-token/enable-transfer true {})
+  (doseq [tx-hash [(mini-me-token/transfer-tokens (nth accounts 4) 100 {:from (nth accounts 0)})
+                   (mini-me-token/transfer-tokens (nth accounts 2) 50 {:from (nth accounts 1)})]]
+    (contract->syncer tx-hash :mini-me-token :Transfer))
 
   ;(dev/print-db)
 

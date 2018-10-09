@@ -20,6 +20,11 @@
     [district.server.smart-contracts :refer [contract-call]]
     [clojure.set :refer [rename-keys]]))
 
+(defn update-voter-tokens [address]
+  (db/upsert-voter->tokens! {:voter/address address
+                             :voter/tokens-balance (-> (mini-me-token/balance-of address {})
+                                                       :tokens-balance)}))
+
 (defmulti process-event #(:event %))
 
 (defmethod process-event "LogAddTask" [{:keys [args] :as event}]
@@ -53,16 +58,18 @@
   (db/insert-voter! {:task/id (:task-id args)
                      :bid/id (:bid-id args)
                      :voter/address (:voter args)})
-  (db/upsert-voter->tokens! {:voter/address (:voter args)
-                             :voter/tokens-balance (-> (mini-me-token/balance-of (:voter args) {})
-                                                       :tokens-balance)}))
+  (update-voter-tokens (:voter args)))
 
-(defn dispatch-event [err event]
-  (let [event (district-tasks/event->cljs event)
-        event (merge event
-                     (-> (web3-eth/get-block @web3 (:block-hash event) false)
-                         (select-keys [:number :timestamp])
-                         (rename-keys {:number :block-number})))]
+(defmethod process-event "Transfer" [{:keys [args] :as event}]
+  (update-voter-tokens (:_from args))
+  (update-voter-tokens (:_to args)))
+
+(defn dispatch-event [contract-key err event]
+  (let [event (cond-> (merge event
+                             (-> (web3-eth/get-block @web3 (:block-hash event) false)
+                                 (select-keys [:number :timestamp])
+                                 (rename-keys {:number :block-number})))
+                      (= contract-key :district-tasks) (district-tasks/event->cljs))]
     (log/debug "Dispatching " event)
     (process-event event)))
 
@@ -70,15 +77,17 @@
 (declare stop)
 
 (def watchers [{:watcher [:district-tasks :LogAddTask]
-                :on-event dispatch-event}
+                :on-event (partial dispatch-event :district-tasks)}
                {:watcher [:district-tasks :LogUpdateTask]
-                :on-event dispatch-event}
+                :on-event (partial dispatch-event :district-tasks)}
                {:watcher [:district-tasks :LogAddBid]
-                :on-event dispatch-event}
+                :on-event (partial dispatch-event :district-tasks)}
                {:watcher [:district-tasks :LogRemoveBid]
-                :on-event dispatch-event}
+                :on-event (partial dispatch-event :district-tasks)}
                {:watcher [:district-tasks :LogAddVoter]
-                :on-event dispatch-event}])
+                :on-event (partial dispatch-event :district-tasks)}
+               {:watcher [:mini-me-token :Transfer]
+                :on-event (partial dispatch-event :mini-me-token)}])
 
 (defstate ^{:on-reload :noop} syncer
   :start (start (merge (:syncer @config)
