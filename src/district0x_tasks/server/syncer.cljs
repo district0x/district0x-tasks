@@ -16,6 +16,7 @@
     [cljs-ipfs-api.files :as ifiles]
     [print.foo :refer [look] :include-macros true]
     [district0x-tasks.server.contracts.district-tasks :as district-tasks]
+    [contracts.mini-me-token :as mini-me-token]
     [district.server.smart-contracts :refer [contract-call]]
     [clojure.set :refer [rename-keys]]))
 
@@ -51,7 +52,10 @@
 (defmethod process-event "LogAddVoter" [{:keys [args] :as event}]
   (db/insert-voter! {:task/id (:task-id args)
                      :bid/id (:bid-id args)
-                     :voter/address (:voter args)}))
+                     :voter/address (:voter args)})
+  (db/upsert-voter->tokens! {:voter/address (:voter args)
+                             :voter/tokens-balance (-> (mini-me-token/balance-of (:voter args) {})
+                                                       :tokens-balance)}))
 
 (defn dispatch-event [err event]
   (let [event (district-tasks/event->cljs event)

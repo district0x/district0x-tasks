@@ -41,7 +41,7 @@
 
 (def voters->tokens-columns
   [[:voter/address address not-nil]
-   [:voter/tokens-amount :unsigned :integer not-nil]])
+   [:voter/tokens-balance :unsigned :integer not-nil]])
 
 (def voters->tokens-column-names (map first voters->tokens-columns))
 
@@ -140,14 +140,14 @@
 (def insert-voter->tokens! (create-insert-fn :voters->tokens voters->tokens-column-names))
 (def update-voter->tokens! (create-update-fn :voters->tokens voters->tokens-column-names :voter/address))
 (def get-voter->tokens (create-get-fn :voters->tokens :voter/address))
-(defn upsert-voter->tokens! [voter->token]
-  (if (not-empty (get-voter->tokens voter->token [:*]))
-    (update-voter->tokens! voter->token)
-    (insert-voter->tokens! voter->token)))
+(defn upsert-voter->tokens! [voter-token]
+  (if (not-empty (get-voter->tokens voter-token [:*]))
+    (update-voter->tokens! voter-token)
+    (insert-voter->tokens! voter-token)))
 (defn sum-voters->tokens [bid]
   (let [task-id (:task/id bid)
         bid-id (:bid/id bid)]
-    (-> (db/get {:select [[(sql/call :sum :v->t.voter/tokens-amount) :sum]]
+    (-> (db/get {:select [[(sql/call :sum :v->t.voter/tokens-balance) :sum]]
                  :from [[:voters :v] [:voters->tokens :v->t]]
                  :where [:and [:= :v.task/id task-id] [:= :v.bid/id bid-id]
                          [:= :v.voter/address :v->t.voter/address]]})

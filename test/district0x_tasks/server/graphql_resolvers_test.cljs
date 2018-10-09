@@ -6,6 +6,7 @@
             [district.server.graphql :as graphql]
             [district0x-tasks.server.db :as db]
             [district0x-tasks.server.contracts.district-tasks :as district-tasks]
+            [contracts.mini-me-token :as mini-me-token]
             [district.server.web3 :refer [web3]]
             [cljs-web3.eth :as web3-eth]
             [district.server.smart-contracts :refer [replay-past-events contract-event-in-tx contract-call]]
@@ -52,6 +53,11 @@
   (-> (district-tasks/remove-bid 1 0 {})
       (contract->syncer :district-tasks :LogRemoveBid))
 
+  ;; prepare tokens, no events for this, just call contract
+  (mini-me-token/generate-tokens (nth accounts 0) 10 {:gas 130000})
+  (mini-me-token/generate-tokens (nth accounts 1) 100 {:gas 130000})
+  (mini-me-token/generate-tokens (nth accounts 2) 200 {:gas 130000})
+  (mini-me-token/generate-tokens (nth accounts 4) 300 {:gas 130000})
 
   (doseq [tx-hash [(district-tasks/add-voter 1 1 {:from (nth accounts 0)})
                    (district-tasks/add-voter 1 1 {:from (nth accounts 1)})
@@ -59,17 +65,12 @@
                    (district-tasks/add-voter 3 2 {:from (nth accounts 0)})
                    (district-tasks/add-voter 3 2 {:from (nth accounts 1)})
                    (district-tasks/add-voter 3 2 {:from (nth accounts 2)})
-                   (district-tasks/add-voter 3 2 {:from (nth accounts 3)})]]
+                   (district-tasks/add-voter 3 2 {:from (nth accounts 4)})]]
     (contract->syncer tx-hash :district-tasks :LogAddVoter))
 
-  (db/upsert-voter->tokens! {:voter/address (nth accounts 0)
-                             :voter/tokens-amount 10})
-  (db/upsert-voter->tokens! {:voter/address (nth accounts 1)
-                             :voter/tokens-amount 100})
-  (db/upsert-voter->tokens! {:voter/address (nth accounts 2)
-                             :voter/tokens-amount 200})
-  (db/upsert-voter->tokens! {:voter/address (nth accounts 3)
-                             :voter/tokens-amount 300})
+  ;; todo token transfer events here instead
+
+
 
   ;(dev/print-db)
 

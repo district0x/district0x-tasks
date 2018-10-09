@@ -12,6 +12,9 @@
 (defn deploy-tasks-contract! [default-opts]
   (deploy-smart-contract! :district-tasks (merge default-opts {:gas 2000000})))
 
+(defn deploy-mini-me-token-contract! [default-opts]
+  (deploy-smart-contract! :mini-me-token (merge default-opts {:gas 2000000})))
+
 (defn deploy [{:keys [:write?]
                :as deploy-opts}]
   (let [accounts (web3-eth/accounts @web3)
@@ -19,6 +22,7 @@
                            deploy-opts)]
 
     (deploy-tasks-contract! deploy-opts)
+    (deploy-mini-me-token-contract! deploy-opts)
 
     (when write?
       (write-smart-contracts!))))

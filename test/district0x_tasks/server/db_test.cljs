@@ -82,14 +82,14 @@
 
   (testing "SQL voters->tokens"
     (is (= 1 (-> (db/upsert-voter->tokens! {:voter/address "0x71651917485a651bb9871d62b54507afcca6ca03"
-                                            :voter/tokens-amount 456})
+                                            :voter/tokens-balance 456})
                  :changes)))
     (is (= 1 (-> (db/upsert-voter->tokens! {:voter/address "0x71651917485a651bb9871d62b54507afcca6ca03"
-                                            :voter/tokens-amount 444})
+                                            :voter/tokens-balance 444})
                  :changes)))
     (is (= (db/get-voter->tokens {:voter/address "0x71651917485a651bb9871d62b54507afcca6ca03"} [:*])
            {:voter/address "0x71651917485a651bb9871d62b54507afcca6ca03"
-            :voter/tokens-amount 444})))
+            :voter/tokens-balance 444})))
 
   (testing "SQL bid sum of tokens"
     (db/insert-bid! {:task/id 124
@@ -107,9 +107,9 @@
                        :bid/id 111
                        :voter/address "0x0000000000000000000000000000000000000001"})
     (db/upsert-voter->tokens! {:voter/address "0x0000000000000000000000000000000000000000"
-                               :voter/tokens-amount 100})
+                               :voter/tokens-balance 100})
     (db/upsert-voter->tokens! {:voter/address "0x0000000000000000000000000000000000000001"
-                               :voter/tokens-amount 50})
+                               :voter/tokens-balance 50})
     (is (= 150 (db/sum-voters->tokens {:task/id 124
                                        :bid/id 111}))))
 
