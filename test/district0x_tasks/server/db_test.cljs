@@ -1,9 +1,6 @@
 (ns district0x-tasks.server.db-test
   (:require [cljs.test :refer-macros [deftest is testing run-tests use-fixtures async]]
-            [district0x-tasks.server.dev :as dev]
-            [district0x-tasks.server.deployer :as deployer]
             [district0x-tasks.server.db :as db]
-            [cljs-web3.eth :as web3-eth]
             [district.server.web3 :refer [web3]]
             [district0x-tasks.utils :as utils :refer [accounts]]))
 

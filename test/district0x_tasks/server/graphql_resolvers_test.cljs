@@ -1,19 +1,15 @@
 (ns district0x-tasks.server.graphql-resolvers-test
   (:require [cljs.test :refer-macros [deftest is testing run-tests use-fixtures async]]
-            [district0x-tasks.server.dev :as dev]
-            [district0x-tasks.server.deployer :as deployer]
-            [district0x-tasks.server.graphql-resolvers :as resolver]
             [district.server.graphql :as graphql]
-            [district0x-tasks.server.db :as db]
             [district0x-tasks.server.contracts.district-tasks :as district-tasks]
             [contracts.mini-me-token :as mini-me-token]
-            [district.server.web3 :refer [web3]]
-            [cljs-web3.eth :as web3-eth]
-            [district.server.smart-contracts :refer [replay-past-events contract-event-in-tx contract-call]]
+            [district.server.smart-contracts :refer [contract-event-in-tx]]
             [district0x-tasks.server.syncer :as syncer]
-            [district0x-tasks.utils :as utils :refer [accounts]]))
+            [district0x-tasks.utils :as utils :refer [accounts inc-eth-time! feature-in-seconds]]))
 
 (use-fixtures :once utils/prepare-contracts)
+
+(def feature-timestamp (feature-in-seconds))
 
 (def watchers
   (->> syncer/watchers
@@ -25,20 +21,14 @@
     (->> (contract-event-in-tx tx-hash contract-key event-name {})
          (on-event nil))))
 
-(def feature-in-seconds
-  (-> (.getTime (js/Date.))
-      (quot 1000)
-      (inc)
-      (+ 600)))
-
 (deftest graphql-test
-  (doseq [tx-hash [(district-tasks/add-task "Active 0" feature-in-seconds true {})
-                   (district-tasks/add-task "Task 1" feature-in-seconds true {})
-                   (district-tasks/add-task "Task 2" feature-in-seconds true {})
-                   (district-tasks/add-task "Task 3" feature-in-seconds true {})]]
+  (doseq [tx-hash [(district-tasks/add-task "Active 0" feature-timestamp true {})
+                   (district-tasks/add-task "Task 1" feature-timestamp true {})
+                   (district-tasks/add-task "Task 2" feature-timestamp true {})
+                   (district-tasks/add-task "Task 3" feature-timestamp true {})]]
     (contract->syncer tx-hash :district-tasks :LogAddTask))
 
-  (-> (district-tasks/update-task 0 "Not active 0" feature-in-seconds false {})
+  (-> (district-tasks/update-task 0 "Not active 0" feature-timestamp false {})
       (contract->syncer :district-tasks :LogUpdateTask))
 
   (doseq [tx-hash [(district-tasks/add-bid 1 "Bid 1.0" "http://example.com/" "Bid to remove" 0.01 {})
@@ -57,7 +47,7 @@
   (mini-me-token/generate-tokens (nth accounts 0) 110 {:gas 130000})
   (mini-me-token/generate-tokens (nth accounts 1) 150 {:gas 130000})
   (mini-me-token/generate-tokens (nth accounts 2) 150 {:gas 130000})
-  (mini-me-token/generate-tokens (nth accounts 4) 200 {:gas 130000})
+  (mini-me-token/generate-tokens (nth accounts 3) 200 {:gas 130000})
 
   (doseq [tx-hash [(district-tasks/add-voter 1 1 {:from (nth accounts 0)})
                    (district-tasks/add-voter 1 1 {:from (nth accounts 1)})
@@ -65,11 +55,11 @@
                    (district-tasks/add-voter 3 2 {:from (nth accounts 0)})
                    (district-tasks/add-voter 3 2 {:from (nth accounts 1)})
                    (district-tasks/add-voter 3 2 {:from (nth accounts 2)})
-                   (district-tasks/add-voter 3 2 {:from (nth accounts 4)})]]
+                   (district-tasks/add-voter 3 2 {:from (nth accounts 3)})]]
     (contract->syncer tx-hash :district-tasks :LogAddVoter))
 
   (mini-me-token/enable-transfer true {})
-  (doseq [tx-hash [(mini-me-token/transfer-tokens (nth accounts 4) 100 {:from (nth accounts 0)})
+  (doseq [tx-hash [(mini-me-token/transfer-tokens (nth accounts 3) 100 {:from (nth accounts 0)})
                    (mini-me-token/transfer-tokens (nth accounts 2) 50 {:from (nth accounts 1)})]]
     (contract->syncer tx-hash :mini-me-token :Transfer))
 
@@ -81,12 +71,12 @@
                              [:task/bids [:bid/id :bid/creator :bid/title :bid/url :bid/description :bid/amount :bid/votes-sum]]]]]})
               :data
               :active-tasks)
-         [{:task/id "1" :task/title "Task 1" :task/is-active true :task/bidding-ends-on feature-in-seconds
+         [{:task/id "1" :task/title "Task 1" :task/is-active true :task/bidding-ends-on feature-timestamp
            :task/bids [{:bid/id "1" :bid/creator (second accounts) :bid/title "Bid 1.1" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 0.11 :bid/votes-sum 110}
                        {:bid/id "2" :bid/creator (first accounts) :bid/title "Bid 1.2" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 0.12 :bid/votes-sum 10}]}
-          {:task/id "2" :task/title "Task 2" :task/is-active true :task/bidding-ends-on feature-in-seconds
+          {:task/id "2" :task/title "Task 2" :task/is-active true :task/bidding-ends-on feature-timestamp
            :task/bids [{:bid/id "0" :bid/creator (first accounts) :bid/title "Bid 2.1" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 1.32 :bid/votes-sum 0}]}
-          {:task/id "3" :task/title "Task 3" :task/is-active true :task/bidding-ends-on feature-in-seconds
+          {:task/id "3" :task/title "Task 3" :task/is-active true :task/bidding-ends-on feature-timestamp
            :task/bids [{:bid/id "0" :bid/creator (first accounts) :bid/title "Bid 3.0" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 278 :bid/votes-sum 0}
                        {:bid/id "1" :bid/creator (first accounts) :bid/title "Bid 3.1" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 254 :bid/votes-sum 0}
                        {:bid/id "2" :bid/creator (first accounts) :bid/title "Bid 3.2" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 289.35 :bid/votes-sum 610}]}])

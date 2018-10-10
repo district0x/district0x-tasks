@@ -1,14 +1,8 @@
 (ns district0x-tasks.contracts.tasks-test
   (:require [cljs.test :refer-macros [deftest is testing run-tests use-fixtures async]]
-            [cljs.core.async :refer [<! timeout]]
-            [cljs-web3.eth :as web3-eth]
-            [district.server.web3 :refer [web3]]
-            [district.server.smart-contracts :refer [contract-call]]
-            [district0x-tasks.server.dev :as dev]
-            [district0x-tasks.server.deployer :as deployer]
             [district0x-tasks.server.contracts.district-tasks :as district-tasks]
             [district.server.smart-contracts :refer [replay-past-events contract-event-in-tx]]
-            [district0x-tasks.utils :as utils :refer [accounts]]))
+            [district0x-tasks.utils :as utils :refer [accounts inc-eth-time! feature-in-seconds]]))
 
 (use-fixtures :once utils/prepare-contracts)
 
@@ -16,27 +10,8 @@
   (-> (district-tasks/event->cljs event)
       (select-keys [:args :event])))
 
-;; Ganache CLI v6.1.8 (ganache-core: 2.2.1) block.timestamp is now instead of timestamp of last block
-(defn now-in-seconds []
-  (-> (.getTime (js/Date.))
-      (quot 1000)
-      (inc)))
-
-#_(defn last-block-timestamp []
-    (->> (web3-eth/block-number @web3)
-         (web3-eth/get-block @web3)
-         :timestamp))
-
-;; temporary solution, because ganache-cli block.timestamp is now instead of last block timestamp
-(defn sleep [seconds]
-  (let [deadline (-> (* seconds 1000)
-                     (+ (.getTime (js/Date.))))]
-    (while (> deadline (.getTime (js/Date.))))))
-
-
-
 (deftest tasks-test
-  (let [bidding-ends-on (+ (now-in-seconds) 10)]
+  (let [bidding-ends-on (feature-in-seconds)]
     (testing "Only Owner can addTasks, updateActive and updateBiddingEndsOn"
       (is (thrown? js/Error
                    (district-tasks/add-task "Title" bidding-ends-on true {:from (last accounts)}))
@@ -48,7 +23,7 @@
              {:bidding-ends-on bidding-ends-on
               :active? true}))))
 
-  (let [bidding-ends-on (+ (now-in-seconds) 10)
+  (let [bidding-ends-on (feature-in-seconds)
         bidding-ends-on2 (+ bidding-ends-on 1)]
     (testing "Task update test"
       (is (district-tasks/add-task "Title exist only in events" bidding-ends-on false {}))
@@ -80,24 +55,20 @@
     (is (= (district-tasks/get-voters 0 0 {})
            [(first accounts)])))
 
-  (let [bidding-ends-on (+ (now-in-seconds) 2)]
+  (let [bidding-ends-on (feature-in-seconds)]
     (testing "BiddingEndsOn, Active testing"
       (district-tasks/add-task "Title" bidding-ends-on false {})
       (is (thrown? js/Error
                    (district-tasks/add-bid 2 "Bid title" "http://example.com" "Bid description" 121.00 {}))
           "should not pass, because task is not active")
       (is (district-tasks/update-task 2 "Title" bidding-ends-on true {}))
-      ;; temporary solution, because ganache-cli block.timestamp is now instead of last block timestamp
-      (sleep 2)
-      ;; when block.timestamp will became last block timestamp
-      ;(web3-evm/increase-time! @web3 [1])
-      ;(web3-evm/mine! @web3)
+      (inc-eth-time!)
       (is (thrown? js/Error
                    (district-tasks/add-bid 2 "Bid title" "https://example.org" "Bid description" 678.90 {}))
           "should not pass, because BiddingEndsOn expired")))
 
   (testing "events"
-    (let [bidding-ends-on (+ (now-in-seconds) 60)]
+    (let [bidding-ends-on (feature-in-seconds)]
       (is (= (-> (district-tasks/add-task "Event test" bidding-ends-on false {})
                  (contract-event-in-tx :district-tasks :LogAddTask {})
                  (event->test))
