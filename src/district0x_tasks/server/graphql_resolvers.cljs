@@ -30,6 +30,8 @@
 (def resolvers-map
   {:Query {:active-tasks active-tasks
            :bids #(task->bids %2)}
-   :Task {:task/bids task->bids
+   :Task {
+          :task/bidding-ends-on #(* 1000 (:task/bidding-ends-on %))
+          :task/bids task->bids
           :task/is-active #(:task/active? %)}
    :Bid {:bid/votes-sum bid->votes-aum}})
