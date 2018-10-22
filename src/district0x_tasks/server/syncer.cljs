@@ -21,9 +21,10 @@
     [clojure.set :refer [rename-keys]]))
 
 (defn update-voter-tokens [address]
-  (db/upsert-voter->tokens! {:voter/address address
-                             :voter/tokens-balance (-> (mini-me-token/balance-of address {})
-                                                       :tokens-balance)}))
+  (when-not (= "0x0000000000000000000000000000000000000000" address)
+    (db/upsert-voter->tokens! {:voter/address address
+                               :voter/tokens-balance (-> (mini-me-token/balance-of address {})
+                                                         :tokens-balance)})))
 
 (defmulti process-event #(:event %))
 
@@ -58,6 +59,7 @@
   (db/insert-voter! {:task/id (:task-id args)
                      :bid/id (:bid-id args)
                      :voter/address (:voter args)})
+  (println (:task-id args) (:bid-id args) "voter" (:voter args))
   (update-voter-tokens (:voter args)))
 
 (defmethod process-event "Transfer" [{:keys [args] :as event}]
