@@ -59,7 +59,6 @@
   (db/insert-voter! {:task/id (:task-id args)
                      :bid/id (:bid-id args)
                      :voter/address (:voter args)})
-  (println (:task-id args) (:bid-id args) "voter" (:voter args))
   (update-voter-tokens (:voter args)))
 
 (defmethod process-event "Transfer" [{:keys [args] :as event}]
