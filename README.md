@@ -18,7 +18,7 @@ lein solc auto
 
 Start server:
 ```bash
-ganache-cli -p 8549
+ganache-cli -d -p 8545 -m district0x
 lein repl
 (start-server!)
 node dev-server/district0x-tasks.js
@@ -34,7 +34,7 @@ lein repl
 # How to do tests:
 
 ```bash
-ganache-cli -p 8545
+ganache-cli -d -p 8545 -m district0x
 lein test-doo
 ```
 
