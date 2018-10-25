@@ -28,8 +28,6 @@
     [re-frisk.core :refer [enable-re-frisk!]]
     [re-frame.core :as re-frame]))
 
-(goog-define server-config-url "http://localhost:6200/config")
-
 (def debug? ^boolean js/goog.DEBUG)
 
 (defn dev-setup []
@@ -41,7 +39,7 @@
   (s/check-asserts debug?)
   (dev-setup)
   (-> (mount/with-args
-        (merge {:web3 {:url "http://localhost:8549"}
+        (merge {:web3 {:url "http://localhost:8545"}
                 :smart-contracts {:contracts smart-contracts}
                 :web3-balances {:contracts (select-keys smart-contracts [:mini-me-token])}
                 :web3-tx-log {:open-on-tx-hash? true
@@ -52,6 +50,5 @@
                          :default-route :route.administrative/index}
                 :router-google-analytics {:enabled? (not debug?)}
                 :graphql {:schema graphql-schema
-                          :url "http://localhost:6500/graphql"}}
-               {:server-config {:url server-config-url}}))
+                          :url "http://localhost:6500/graphql"}}))
       (mount/start)))
