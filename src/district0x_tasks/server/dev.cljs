@@ -89,8 +89,7 @@
                                       :graphiql true}
                             :web3 {:port 8545}
                             :generator {}
-                            :deployer {}
-                            :ipfs {:host "http://127.0.0.1:5001" :endpoint "/api/v0" :gateway "http://127.0.0.1:8080/ipfs"}}}
+                            :deployer {}}}
          :smart-contracts {:contracts-var #'district0x-tasks.shared.smart-contracts/smart-contracts
                            :print-gas-usage? true
                            :auto-mining? true}})
