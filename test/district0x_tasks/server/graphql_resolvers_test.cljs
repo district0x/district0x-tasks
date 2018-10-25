@@ -68,18 +68,18 @@
     (is (= (->> (graphql/run-query
                   {:queries [[:active-tasks
                               [:task/id :task/title :task/is-active :task/bidding-ends-on
-                               [:task/bids [:bid/id :bid/creator :bid/title :bid/url :bid/description :bid/amount :bid/votes-sum]]]]]})
+                               [:task/bids [:task/id :bid/id :bid/creator :bid/title :bid/url :bid/description :bid/amount :bid/votes-sum]]]]]})
                 :data
                 :active-tasks)
            [{:task/id "1" :task/title "Task 1" :task/is-active true :task/bidding-ends-on (* 1000 feature-timestamp)
-             :task/bids [{:bid/id "1" :bid/creator (second accounts) :bid/title "Bid 1.1" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 0.11 :bid/votes-sum 110}
-                         {:bid/id "2" :bid/creator (first accounts) :bid/title "Bid 1.2" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 0.12 :bid/votes-sum 10}]}
+             :task/bids [{:task/id "1" :bid/id "1" :bid/creator (second accounts) :bid/title "Bid 1.1" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 0.11 :bid/votes-sum 110}
+                         {:task/id "1" :bid/id "2" :bid/creator (first accounts) :bid/title "Bid 1.2" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 0.12 :bid/votes-sum 10}]}
             {:task/id "2" :task/title "Task 2" :task/is-active true :task/bidding-ends-on (* 1000 feature-timestamp)
-             :task/bids [{:bid/id "0" :bid/creator (first accounts) :bid/title "Bid 2.1" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 1.32 :bid/votes-sum 0}]}
+             :task/bids [{:task/id "2" :bid/id "0" :bid/creator (first accounts) :bid/title "Bid 2.1" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 1.32 :bid/votes-sum 0}]}
             {:task/id "3" :task/title "Task 3" :task/is-active true :task/bidding-ends-on (* 1000 feature-timestamp)
-             :task/bids [{:bid/id "0" :bid/creator (first accounts) :bid/title "Bid 3.0" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 278 :bid/votes-sum 0}
-                         {:bid/id "1" :bid/creator (first accounts) :bid/title "Bid 3.1" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 254 :bid/votes-sum 0}
-                         {:bid/id "2" :bid/creator (first accounts) :bid/title "Bid 3.2" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 289.35 :bid/votes-sum 610}]}])
+             :task/bids [{:task/id "3" :bid/id "0" :bid/creator (first accounts) :bid/title "Bid 3.0" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 278 :bid/votes-sum 0}
+                         {:task/id "3" :bid/id "1" :bid/creator (first accounts) :bid/title "Bid 3.1" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 254 :bid/votes-sum 0}
+                         {:task/id "3" :bid/id "2" :bid/creator (first accounts) :bid/title "Bid 3.2" :bid/url "http://example.com/" :bid/description "Bid description" :bid/amount 289.35 :bid/votes-sum 610}]}])
         "active-tasks")
 
     (is (->> (graphql/run-query

@@ -20,6 +20,7 @@
 
   type Bid {
     bid_id: ID,
+    task_id: ID,
     bid_creator: String,
     bid_title: String,
     bid_url: String,

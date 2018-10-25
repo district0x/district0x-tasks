@@ -1,9 +1,9 @@
-(ns district0x-tasks.shared.smart-contracts)
+(ns district0x-tasks.shared.smart-contracts) 
 
-(def smart-contracts
-  {:district-tasks
-   {:name "DistrictTasks",
-    :address "0x4b690b32fb7d421b05d1b9f5fea6a72d43029e01"}
-   :mini-me-token
-   {:name "MiniMeToken"
-    :address "0x4b690b32fb7d421b05d1b9f5fea6a72d43029e02"}})
+(def smart-contracts 
+{:district-tasks
+ {:name "DistrictTasks",
+  :address "0x74fc6891ef3c2b4d22f594fdd9dea5c9f1a123a9"},
+ :mini-me-token
+ {:name "MiniMeToken",
+  :address "0x2a869142f6b6547e711150175d64fe8296aa18ec"}})
