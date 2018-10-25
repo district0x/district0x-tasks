@@ -34,7 +34,7 @@ lein repl
 # How to do tests:
 
 ```bash
-ganache-cli -p 8549
+ganache-cli -p 8545
 lein test-doo
 ```
 

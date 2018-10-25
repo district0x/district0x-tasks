@@ -87,7 +87,7 @@
                                       :field-resolver (utils/build-default-field-resolver graphql-utils/gql-name->kw)
                                       :path "/graphql"
                                       :graphiql true}
-                            :web3 {:port 8549}
+                            :web3 {:port 8545}
                             :generator {}
                             :deployer {}
                             :ipfs {:host "http://127.0.0.1:5001" :endpoint "/api/v0" :gateway "http://127.0.0.1:8080/ipfs"}}}
