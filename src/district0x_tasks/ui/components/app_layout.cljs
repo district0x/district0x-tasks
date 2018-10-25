@@ -2,7 +2,7 @@
   (:require
     [district.ui.component.active-account :refer [active-account]]
     [district.ui.component.active-account-balance :refer [active-account-balance]]
-    [district.ui.component.form.input :as inputs :refer [text-input*]]
+    [district.ui.component.form.input :as inputs]
     [district.ui.component.font-icons :as icons]
     [re-frame.core :refer [subscribe dispatch]]
     [district.ui.graphql.subs :as gql]
@@ -12,8 +12,10 @@
     [reagent.core :as r]
     [re-frame.core :as re-frame]
     [district.ui.router.subs :as router-subs]
+    [district0x-tasks.ui.events :as events]
     [district.format :as format]
-    [reagent.format :as r-format]))
+    [reagent.format :as r-format])
+  (:require-macros [reagent.ratom :refer [reaction]]))
 
 (def pages
   [{:route :route.administrative/index
@@ -26,7 +28,8 @@
     :title "Community and Marketing"
     :icon "icon-thumb-up"}
    {:route :route.d0xinfra/index
-    :title "d0xINFRA"}
+    :title "d0xINFRA"
+    :icon "icon-circles"}
    {:route :route.district-registry/index
     :title "District Registry"
     :icon "icon-registry"}
@@ -64,57 +67,84 @@
                        (find-page)
                        (first)
                        :title)
-        task (->> @(re-frame/subscribe [::gql/query
-                                        {:queries
-                                         [[:active-tasks
-                                           [:task/id :task/title :task/is-active :task/bidding-ends-on
-                                            [:task/bids [:bid/id :bid/creator :bid/title :bid/url :bid/description :bid/amount :bid/votes-sum]]]]]}])
+        task-raw (re-frame/subscribe [::gql/query
+                                      {:queries
+                                       [[:active-tasks
+                                         [:task/id :task/title :task/is-active :task/bidding-ends-on
+                                          [:task/bids [:bid/id :bid/creator :bid/title :bid/url :bid/description :bid/amount :bid/votes-sum]]]]]}])
+        task (->> @task-raw
                   :active-tasks
                   (filter #(= page-title (:task/title %)))
                   (first))
-        bids (:task/bids task)
-        bids-sum (reduce #(+ %1 (:bid/votes-sum %2)) 0 bids)
-        ?interval (when (some-> (:task/bidding-ends-on task)
-                                (t/after? (t/now)))
-                    (let [interval-raw (t/interval (t/now) (:task/bidding-ends-on task))]
-                      {:d (t/in-days interval-raw)
-                       :h (mod (t/in-hours interval-raw) 24)}))]
-    [:div.app-page
-     [icons/icon-mechanics]
-     [:div.page-top
-      [:h1 page-title]
-      [:p "Lorem ipsum"]
-      (if ?interval
-        [:p "Bidding and voting will be closed in " (:d ?interval) " days " (:h ?interval) " hours."]
-        [:p "Bidding and voting is closed."])]
+        form-data (r/atom {:task/id (:task/id task)})]
+    (fn []
+      (let [task (->> @task-raw
+                      :active-tasks
+                      (filter #(= page-title (:task/title %)))
+                      (first))
+            bids (:task/bids task)
+            bids-sum (reduce #(+ %1 (:bid/votes-sum %2)) 0 bids)
+            ?interval (when (some-> (:task/bidding-ends-on task)
+                                    (t/after? (t/now)))
+                        (let [interval-raw (t/interval (t/now) (:task/bidding-ends-on task))]
+                          {:d (t/in-days interval-raw)
+                           :h (mod (t/in-hours interval-raw) 24)}))]
+        [:div.app-page
+         [icons/icon-mechanics]
+         [:div.page-top
+          [:h1 page-title]
+          [:p "Lorem ipsum"]
+          (if ?interval
+            [:p "Bidding and voting will be closed in " (:d ?interval) " days " (:h ?interval) " hours."]
+            [:p "Bidding and voting is closed."])]
 
-     (into [:div.bids
-            [:h2 "Bids"]]
-           (for [bid bids]
-             [:div.bid
-              [:a {:href (not-empty (:bid/url bid))} (:bid/title bid)]
-              [:p (:bid/description bid)]
-              [:p (:bid/amount bid)]
-              [:div.votes-line
-               [:hr {:width "30%"}]
-               [:hr]]
-              [:p.votes-text (format/format-token (:bid/votes-sum bid) {:token "DNT"}) " (" (format-percentage (/ (:bid/votes-sum bid) bids-sum)) ")"]
-              [:button.vote "Vote"]]))
+         (into [:div.bids
+                [:h2 "Bids"]]
+               (for [bid bids]
+                 [:div.bid
+                  [:a {:href (not-empty (:bid/url bid))} (:bid/title bid)]
+                  [:p (:bid/description bid)]
+                  [:p (:bid/amount bid)]
+                  [:div.votes-line
+                   [:hr {:width "30%"}]
+                   [:hr]]
+                  [:p.votes-text (format/format-token (:bid/votes-sum bid) {:token "DNT"}) " (" (format-percentage (/ (:bid/votes-sum bid) bids-sum)) ")"]
+                  [inputs/pending-button
+                   {:class "vote"
+                    :pending-text "Voting ..."
+                    :on-click (fn [e]
+                                (.preventDefault e)
+                                (dispatch [::events/add-voter bid]))}
+                   "Vote"]]))
 
-     [:div.bids-form
-      [:h2 "Submit a Bid"]
-      [:form
-       [:input {:name "name"
-                :placeholder "Name"}]
-       [:input {:name "url"
-                :placeholder "Website URL"}]
-       [:input {:name "eth"
-                :placeholder "Bid"}]
-       [:textarea {:name "description"
-                   :placeholder "Description"
-                   :rows 10
-                   :cols 40}]
-       [:button "Submit"]]]]))
+         [:div.bids-form
+          [:h2 "Submit a Bid"]
+          [:form
+           [inputs/text-input {:form-data form-data
+                               :required true
+                               :id :bid/name
+                               :placeholder "Name"}]
+           [inputs/text-input {:form-data form-data
+                               :type :url
+                               :id :bid/url
+                               :placeholder "Website URL"}]
+           [inputs/text-input {:form-data form-data
+                               :type :number
+                               :required true
+                               :id :bid/amount
+                               :placeholder "Bid"}]
+           [inputs/textarea-input {:form-data form-data
+                                   :required true
+                                   :id :bid/description
+                                   :placeholder "Description"
+                                   :rows 10
+                                   :cols 40}]
+           [inputs/pending-button
+            {:pending-text "Submitting ..."
+             :on-click (fn [e]
+                         (.preventDefault e)
+                         (dispatch [::events/add-bid @form-data]))}
+            "Submit"]]]]))))
 
 (defn footer []
   [:div.footer
