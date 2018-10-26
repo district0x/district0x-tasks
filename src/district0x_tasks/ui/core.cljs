@@ -18,6 +18,7 @@
     [district.ui.web3-tx-log]
     [district.ui.web3-tx]
     [district.ui.web3]
+    [district0x.re-frame.web3-fx]
     [district.ui.window-size]
     [district0x-tasks.shared.graphql-schema :refer [graphql-schema]]
     [district0x-tasks.shared.routes :refer [routes]]

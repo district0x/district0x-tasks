@@ -71,7 +71,7 @@
                                       {:queries
                                        [[:active-tasks
                                          [:task/id :task/title :task/is-active :task/bidding-ends-on
-                                          [:task/bids [:bid/id :bid/creator :bid/title :bid/url :bid/description :bid/amount :bid/votes-sum]]]]]}])
+                                          [:task/bids [:task/id :bid/id :bid/creator :bid/title :bid/url :bid/description :bid/amount :bid/votes-sum]]]]]}])
         task (->> @task-raw
                   :active-tasks
                   (filter #(= page-title (:task/title %)))
@@ -109,13 +109,13 @@
                    [:hr {:width "30%"}]
                    [:hr]]
                   [:p.votes-text (format/format-token (:bid/votes-sum bid) {:token "DNT"}) " (" (format-percentage (/ (:bid/votes-sum bid) bids-sum)) ")"]
-                  [inputs/pending-button
-                   {:class "vote"
-                    :pending-text "Voting ..."
-                    :on-click (fn [e]
-                                (.preventDefault e)
-                                (dispatch [::events/add-voter bid]))}
-                   "Vote"]]))
+                  (when ?interval
+                    [inputs/pending-button
+                     {:class "vote"
+                      :on-click (fn [e]
+                                  (.preventDefault e)
+                                  (dispatch [::events/voted?->add-voter bid]))}
+                     "Vote"])]))
 
          [:div.bids-form
           [:h2 "Submit a Bid"]
