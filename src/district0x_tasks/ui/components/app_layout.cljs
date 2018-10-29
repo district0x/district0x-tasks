@@ -1,20 +1,23 @@
 (ns district0x-tasks.ui.components.app-layout
   (:require
+    [district.ui.web3-accounts.subs :as accounts-subs]
+    [district.ui.web3-account-balances.subs :as accounts-balances-subs]
     [district.ui.component.active-account :refer [active-account]]
-    [district.ui.component.active-account-balance :refer [active-account-balance]]
+    [district.ui.web3-accounts.events :as accounts-events]
     [district.ui.component.form.input :as inputs]
     [district.ui.component.font-icons :as icons]
     [re-frame.core :refer [subscribe dispatch]]
     [district.ui.graphql.subs :as gql]
     [district0x-tasks.ui.utils :as utils]
     [cljs-time.core :as t]
-    [cljs-time.coerce :as tc]
     [reagent.core :as r]
     [re-frame.core :as re-frame]
     [district.ui.router.subs :as router-subs]
     [district0x-tasks.ui.events :as events]
     [district.format :as format]
-    [reagent.format :as r-format])
+    [reagent.format :as r-format]
+    [cljs-web3.core :as web3]
+    [bignumber.core :as bn])
   (:require-macros [reagent.ratom :refer [reaction]]))
 
 (def pages
@@ -72,11 +75,7 @@
                                        [[:active-tasks
                                          [:task/id :task/title :task/is-active :task/bidding-ends-on
                                           [:task/bids [:task/id :bid/id :bid/creator :bid/title :bid/url :bid/description :bid/amount :bid/votes-sum]]]]]}])
-        task (->> @task-raw
-                  :active-tasks
-                  (filter #(= page-title (:task/title %)))
-                  (first))
-        form-data (r/atom {:task/id (:task/id task)})]
+        form-data (r/atom {})]
     (fn []
       (let [task (->> @task-raw
                       :active-tasks
@@ -119,32 +118,34 @@
 
          [:div.bids-form
           [:h2 "Submit a Bid"]
-          [:form
-           [inputs/text-input {:form-data form-data
-                               :required true
-                               :id :bid/name
-                               :placeholder "Name"}]
-           [inputs/text-input {:form-data form-data
-                               :type :url
-                               :id :bid/url
-                               :placeholder "Website URL"}]
-           [inputs/text-input {:form-data form-data
-                               :type :number
-                               :required true
-                               :id :bid/amount
-                               :placeholder "Bid"}]
-           [inputs/textarea-input {:form-data form-data
-                                   :required true
-                                   :id :bid/description
-                                   :placeholder "Description"
-                                   :rows 10
-                                   :cols 40}]
-           [inputs/pending-button
-            {:pending-text "Submitting ..."
-             :on-click (fn [e]
-                         (.preventDefault e)
-                         (dispatch [::events/add-bid @form-data]))}
-            "Submit"]]]]))))
+          [inputs/text-input {:form-data form-data
+                              :required true
+                              :id :bid/title
+                              :placeholder "Name"}]
+          [inputs/text-input {:form-data form-data
+                              :type :url
+                              :id :bid/url
+                              :placeholder "Website URL"}]
+          [inputs/text-input {:form-data form-data
+                              :type :number
+                              :required true
+                              :id :bid/amount
+                              :min 0
+                              :step 0.01
+                              :placeholder "Bid"}]
+          [inputs/textarea-input {:form-data form-data
+                                  :required true
+                                  :id :bid/description
+                                  :placeholder "Description"
+                                  :rows 10
+                                  :cols 40}]
+          [inputs/pending-button
+           {:on-click (fn [e]
+                        (.preventDefault e)
+                        (if (<= 0 (:bid/amount @form-data))
+                          (dispatch [::events/add-bid (merge {:task/id (:task/id task)} @form-data)])
+                          (js/alert "Bid amount has to be non-negative number.")))}
+           "Submit"]]]))))
 
 (defn footer []
   [:div.footer
@@ -162,18 +163,24 @@
    [:button.icon-github]])
 
 (defn layout []
-  [:div.app-container
-   [:div.top
-    [icons/district0x-logo-with-slogan]
-    [:div.top-right
-     [:span "1,236,346 DNT"]
-     ; address fo user
-     [:div.icon-select-address
-      [:select
-       [:option "0x123123123123123123123123123"]
-       [:option "2"]
-       [:option "3"]]]]]
-   [:div.app-content
-    [menu]
-    [page]]
-   [footer]])
+  (let [accounts (subscribe [::accounts-subs/accounts])
+        active-account (subscribe [::accounts-subs/active-account])
+        active-account-balance (subscribe [::accounts-balances-subs/active-account-balance :DNT])]
+    (fn []
+      [:div.app-container
+       [:div.top
+        [icons/district0x-logo-with-slogan]
+        [:div.top-right
+         [:div.accounts]
+         [:span (format/format-token (bn/number @active-account-balance) {:token "DNT"})]
+         [:div.icon-select-address
+          (into [:select
+                 {:value (str @active-account)
+                  :on-change (fn [event]
+                               (dispatch [::accounts-events/set-active-account event.target.value]))}]
+                (for [account @accounts]
+                  [:option account]))]]]
+       [:div.app-content
+        [menu]
+        [page]]
+       [footer]])))

@@ -42,7 +42,8 @@
   (-> (mount/with-args
         (merge {:web3 {:url "http://localhost:8545"}
                 :smart-contracts {:contracts smart-contracts}
-                :web3-balances {:contracts (select-keys smart-contracts [:mini-me-token])}
+                :web3-balances {:contracts {:DNT (:mini-me-token smart-contracts)}}
+                :web3-account-balances {:for-contracts [:DNT]}
                 :web3-tx-log {:open-on-tx-hash? true
                               :tx-costs-currencies [:USD]}
                 :reagent-render {:id "app"

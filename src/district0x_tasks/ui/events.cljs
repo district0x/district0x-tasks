@@ -11,7 +11,7 @@
   (fn [{:keys [db]} [id bid]]
     {:dispatch [::tx-events/send-tx {:instance (contract-queries/instance db :district-tasks)
                                      :fn :add-bid
-                                     :args [(:task/id bid) (:bid/title bid) (:bid/url bid) (:bid/description bid) (:bid/amount bid)]
+                                     :args [(:task/id bid) (:bid/title bid) (or (:bid/url bid) "") (:bid/description bid) (* 100 (float (:bid/amount bid)))]
                                      :tx-opts {:from (account-queries/active-account db)}
                                      :on-tx-success-n [[::logging/success [id]]
                                                        [::notification-events/show "Bid sent."]]
