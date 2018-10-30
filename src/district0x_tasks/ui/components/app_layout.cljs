@@ -4,6 +4,7 @@
     [district.ui.web3-account-balances.subs :as accounts-balances-subs]
     [district.ui.component.active-account :refer [active-account]]
     [district.ui.web3-accounts.events :as accounts-events]
+    [district.ui.notification.subs :as notification-subs]
     [district.ui.component.form.input :as inputs]
     [district.ui.component.font-icons :as icons]
     [re-frame.core :refer [subscribe dispatch]]
@@ -162,24 +163,33 @@
    [:button.icon-medium]
    [:button.icon-github]])
 
+(defn notifications []
+  (let [notification (re-frame/subscribe [::notification-subs/notification])]
+    (fn []
+      (when (:message @notification)
+        [:div.notification
+         {:class (:type @notification)}
+         (:message @notification)]))))
+
 (defn layout []
   (let [accounts (subscribe [::accounts-subs/accounts])
         active-account (subscribe [::accounts-subs/active-account])
         active-account-balance (subscribe [::accounts-balances-subs/active-account-balance :DNT])]
     (fn []
       [:div.app-container
+       [notifications]
        [:div.top
         [icons/district0x-logo-with-slogan]
         [:div.top-right
-         [:div.accounts]
          [:span (format/format-token (bn/number @active-account-balance) {:token "DNT"})]
-         [:div.icon-select-address
-          (into [:select
-                 {:value (str @active-account)
-                  :on-change (fn [event]
-                               (dispatch [::accounts-events/set-active-account event.target.value]))}]
-                (for [account @accounts]
-                  [:option account]))]]]
+         [:div.accounts
+          [:div.icon-select-address
+           (into [:select
+                  {:value (str @active-account)
+                   :on-change (fn [event]
+                                (dispatch [::accounts-events/set-active-account event.target.value]))}]
+                 (for [account @accounts]
+                   [:option account]))]]]]
        [:div.app-content
         [menu]
         [page]]

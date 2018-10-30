@@ -14,9 +14,9 @@
                                      :args [(:task/id bid) (:bid/title bid) (or (:bid/url bid) "") (:bid/description bid) (* 100 (float (:bid/amount bid)))]
                                      :tx-opts {:from (account-queries/active-account db)}
                                      :on-tx-success-n [[::logging/success [id]]
-                                                       [::notification-events/show "Bid sent."]]
+                                                       [::notification-events/show {:type :success :message "Bid sent."}]]
                                      :on-tx-error-n [[::logging/error [id]]
-                                                     [::notification-events/show "Error during add bid."]]
+                                                     [::notification-events/show "Unknown error during add bid."]]
                                      :on-tx-hash-error [::logging/error [id]]}]}))
 
 (re-frame/reg-event-fx
@@ -29,12 +29,11 @@
                                        :tx-opts {:from (account-queries/active-account db)
                                                  :gas 90000}
                                        :on-tx-success-n [[::logging/success [id]]
-                                                         [::notification-events/show "Vote sent."]]
+                                                         [::notification-events/show {:type :success :message "Vote sent."}]]
                                        :on-tx-error-n [[::logging/error [id]]
-                                                       [::notification-events/show "Error during voting."]]
+                                                       [::notification-events/show "Unknown error during voting."]]
                                        :on-tx-hash-error [::logging/error [id]]}]}
-      (js/alert "You already voted for this bid.")
-      #_{:dispatch [::notification-events/show "You already voted for this bid."]})))
+      {:dispatch [::notification-events/show "You already voted for this bid."]})))
 
 (re-frame/reg-event-fx
   ::voted?->add-voter

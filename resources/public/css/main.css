@@ -23,6 +23,20 @@ body {
 
 /* top */
 
+.notification {
+    position: fixed;
+    width: 100%;
+    padding: 30px;
+    text-align: center;
+    background-color: #FFFDE7;
+    z-index: 1;
+    font-size: 18px;
+}
+
+.notification.success {
+    background-color: #C5E1A5;
+}
+
 .top {
     margin-bottom: 66px;
     height: 121px;
@@ -50,6 +64,7 @@ body {
  .top .top-right .icon-select-address:after {
    position: absolute;
    content: "\e911";
+   transform: rotate(90deg);
    top: 0;
    right: 0;
 
