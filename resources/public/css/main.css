@@ -1,12 +1,16 @@
 /*
- FilsonSoft
- FilsonSoftBook
- ProximaSoft
+ Filson
+ FilsonBook
+ Proxima
  ProximaNova
+ proxima-nova
+ proxima-soft
+ filson-soft
  */
 
 body {
     margin: 0;
+    font-family: 'sans-serif';
 }
 
 .button {
@@ -21,7 +25,7 @@ body {
     box-shadow: 0px 5px 0px 0px #E8EAF2;*/
 }
 
-/* top */
+/* notifications */
 
 .notification {
     position: fixed;
@@ -36,6 +40,17 @@ body {
 .notification.success {
     background-color: #C5E1A5;
 }
+
+.notification-metamask {
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+    background-color: #E1F5FE;
+    z-index: 1;
+    font-size: 18px;
+}
+
+/* top */
 
 .top {
     margin-bottom: 66px;
@@ -116,23 +131,25 @@ body {
 /* menu */
 
 .app-menu {
+    height: 492px;
     width: 300px;
     margin-right: 160px;
     border-radius: 0 20px 20px 0;
 
-    -webkit-box-shadow: 10px 10px 81px 17px rgba(232,234,242,0.08);
-    -moz-box-shadow: 10px 10px 81px 17px rgba(232,234,242,0.08);
-    box-shadow: 10px 10px 81px 17px rgba(232,234,242,0.08);
+    -webkit-box-shadow: 0px 0px 92px 0px rgba(73,79,104,0.11);
+    -moz-box-shadow: 0px 0px 92px 0px rgba(73,79,104,0.11);
+    box-shadow: 0px 0px 92px 0px rgba(73,79,104,0.11);
+
+    font-family: 'proxima-nova';
 }
 
 .app-menu ul {
   margin: 0;
   padding: 0;
+  width: 250px;
 }
 .app-menu ul li {
-    font-size: 16px;
     list-style-type: none;
-    padding: 20px 20px;
 }
 .app-menu ul li:not(:first-child){
   border-top: 1px solid #fbfbfb;
@@ -140,11 +157,21 @@ body {
 .app-menu ul li:not(:last-child) {
   border-bottom: 1px solid #f0f2f6;
 }
-.app-menu ul li:before {
-  display: inline-block;
-  width: 42px;
-  font-size: 22px;
-  color: #88e4e6;
+
+.app-menu a {
+    display: flex;
+    align-items: center;
+    padding: 18px 20px;
+    font-size: 16px;
+    text-decoration: none;
+    color: #47608e;
+}
+
+.app-menu a:before {
+    width: 45px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #88e4e6;
 }
 
 /* page */
@@ -153,7 +180,10 @@ body {
   position: relative;
   flex-grow: 100;
   padding: 98px 80px 70px 140px;
-  border: 1px solid lightpink;
+
+  -webkit-box-shadow: 0px 0px 92px 0px rgba(73,79,104,0.11);
+  -moz-box-shadow: 0px 0px 92px 0px rgba(73,79,104,0.11);
+  box-shadow: 0px 0px 92px 0px rgba(73,79,104,0.11);
 }
 
 .app-page .page-top {
@@ -196,13 +226,14 @@ button.vote {
     position: relative;
     width: 200px;
     height: 50px;
+    font-family: 'filson-soft';
 }
 
 .district0x-logo .district0x {
     position: absolute;
-    top: 0px;
+    top: -5px;
     left: 60px;
-    font-size: 26px;
+    font-size: 30px;
     color: #2c398f;
     font-weight: bold;
 }
@@ -280,9 +311,9 @@ button.vote {
   display: inline-block;
   content: ' ';
   background-image: url('../icons/circles.svg');
-  background-size: 20px 20px;
-  height: 20px;
-  width: 20px;
+  background-size: 26px 26px;
+  background-repeat: no-repeat;
+  height: 26px;
 }
 .icon-pencil-ruler:before {
   content: "\e90a";

@@ -5,6 +5,7 @@
        (map #(vector (keyword (str "span.path" %))))))
 
 (defn district0x-logo []
+  ;[:img {:src "icons/logo.svg"}]
   (into [:span.icon-planet]
         (icon-paths 5)))
 

@@ -163,6 +163,13 @@
    [:button.icon-medium]
    [:button.icon-github]])
 
+(defn notification-metamask []
+  (let [active-account (subscribe [::accounts-subs/active-account])]
+    (fn []
+      (when-not @active-account
+        [:div.notification-metamask
+         "You have to install / unlock " [:a {:href "https://metamask.io/"} "metamask"] " browser extension to vote."]))))
+
 (defn notifications []
   (let [notification (re-frame/subscribe [::notification-subs/notification])]
     (fn []
@@ -177,6 +184,7 @@
         active-account-balance (subscribe [::accounts-balances-subs/active-account-balance :DNT])]
     (fn []
       [:div.app-container
+       [notification-metamask]
        [notifications]
        [:div.top
         [icons/district0x-logo-with-slogan]
@@ -185,7 +193,8 @@
          [:div.accounts
           [:div.icon-select-address
            (into [:select
-                  {:value (str @active-account)
+                  {:on-click #(dispatch [::events/notification-no-accounts])
+                   :value (str @active-account)
                    :on-change (fn [event]
                                 (dispatch [::accounts-events/set-active-account event.target.value]))}]
                  (for [account @accounts]
