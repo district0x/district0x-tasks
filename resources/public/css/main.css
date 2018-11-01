@@ -19,10 +19,6 @@ body {
     color: #69c9e0;
     font-size: 13px;
     line-height: 28px;
-
-/*    -webkit-box-shadow: 0px 5px 0px 0px #E8EAF2;
-    -moz-box-shadow: 0px 5px 0px 0px #E8EAF2;
-    box-shadow: 0px 5px 0px 0px #E8EAF2;*/
 }
 
 /* notifications */
@@ -60,10 +56,9 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-
-    -webkit-box-shadow: 0px 0px 92px 0px rgba(73,79,104,0.11);
-    -moz-box-shadow: 0px 0px 92px 0px rgba(73,79,104,0.11);
-    box-shadow: 0px 0px 92px 0px rgba(73,79,104,0.11);
+    -webkit-box-shadow: 0px 0px 120px 0px rgba(73,79,104,0.11);
+    -moz-box-shadow: 0px 0px 120px 0px rgba(73,79,104,0.11);
+    box-shadow: 0px 0px 120px 0px rgba(73,79,104,0.11);
 }
 
 .top .top-right {
@@ -134,11 +129,10 @@ body {
     height: 492px;
     width: 300px;
     margin-right: 160px;
-    border-radius: 0 20px 20px 0;
-
-    -webkit-box-shadow: 0px 0px 92px 0px rgba(73,79,104,0.11);
-    -moz-box-shadow: 0px 0px 92px 0px rgba(73,79,104,0.11);
-    box-shadow: 0px 0px 92px 0px rgba(73,79,104,0.11);
+    border-radius: 0 10px 10px 0;
+    -webkit-box-shadow: 0px 0px 120px 0px rgba(73,79,104,0.11);
+    -moz-box-shadow: 0px 0px 120px 0px rgba(73,79,104,0.11);
+    box-shadow: 0px 0px 120px 0px rgba(73,79,104,0.11);
 
     font-family: 'proxima-nova';
 }
@@ -180,24 +174,54 @@ body {
   position: relative;
   flex-grow: 100;
   padding: 98px 80px 70px 140px;
-
-  -webkit-box-shadow: 0px 0px 92px 0px rgba(73,79,104,0.11);
-  -moz-box-shadow: 0px 0px 92px 0px rgba(73,79,104,0.11);
-  box-shadow: 0px 0px 92px 0px rgba(73,79,104,0.11);
-}
-
-.app-page .page-top {
-  padding-left: 280px;
+  border-radius: 10px;
+  -webkit-box-shadow: 0px 0px 120px 0px rgba(73,79,104,0.11);
+  -moz-box-shadow: 0px 0px 120px 0px rgba(73,79,104,0.11);
+  box-shadow: 0px 0px 120px 0px rgba(73,79,104,0.11);
 }
 
 .app-page [class^="icon-"], [class*=" icon-"] {
   position: absolute;
   top: 0;
-  left: 100px;
-  font-size: 200px;
+  left: 95px;
+  font-size: 350px;
+}
+
+.app-page .page-top {
+  padding-left: 280px;
+}
+.app-page .page-top h1 {
+    font-family: 'filson-soft';
+}
+.app-page .page-top .description {
+    font-family: 'proxima-soft';
+}
+.app-page .page-top .bidding {
+    font-family: 'proxima-soft';
+    font-weight: 600;
+}
+
+/* page bids */
+
+.bids h2 {
+    font-family: 'filson-soft';
+}
+.bids .bid {
+    font-family: 'proxima-soft';
+}
+.bids .bid a {
+    font-weight: bold;
+}
+
+.bids-form {
+    font-family: 'filson-soft';
+}
+.bids-form h2 {
+    font-family: 'proxima-soft';
 }
 
 /* votes-line */
+
 .votes-line {
   display: flex;
 }
@@ -220,31 +244,19 @@ button.vote {
   float: right;
 }
 
-/* district0x logo */
+/* footer */
 
-.district0x-logo {
-    position: relative;
-    width: 200px;
-    height: 50px;
+.footer {
     font-family: 'filson-soft';
 }
+.footer ul {
+    font-family: 'proxima-soft';
+}
 
-.district0x-logo .district0x {
-    position: absolute;
-    top: -5px;
-    left: 60px;
-    font-size: 30px;
-    color: #2c398f;
-    font-weight: bold;
-}
-.district0x-logo .title {
-    position: absolute;
-    bottom: 4px;
-    left: 60px;
-    color: #48539e;
-}
-.district0x-logo .icon-planet {
-    font-size: 50px;
+/* district0x logo */
+
+img.logo {
+    width: 200px;
 }
 
 /* font-icons */
@@ -302,11 +314,6 @@ button.vote {
 .icon-registry:before {
   content: "\e907";
 }
-/*
-.icon-circles:before {
-  content: "\e908";
-}
-*/
 .icon-circles:before {
   display: inline-block;
   content: ' ';
@@ -321,30 +328,7 @@ button.vote {
 .icon-document:before {
   content: "\e90b";
 }
-.icon-planet .path1:before {
-  content: "\e90c";
-  color: rgb(44, 57, 143);
-}
-.icon-planet .path2:before {
-  content: "\e90d";
-  margin-left: -0.98046875em;
-  color: rgb(4, 255, 204);
-}
-.icon-planet .path3:before {
-  content: "\e90e";
-  margin-left: -0.98046875em;
-  color: rgb(4, 255, 204);
-}
-.icon-planet .path4:before {
-  content: "\e90f";
-  margin-left: -0.98046875em;
-  color: rgb(125, 248, 251);
-}
-.icon-planet .path5:before {
-  content: "\e910";
-  margin-left: -0.98046875em;
-  color: rgb(4, 255, 204);
-}
+
 .icon-arrow:before {
   content: "\e911";
 }

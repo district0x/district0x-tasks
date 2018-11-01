@@ -93,10 +93,10 @@
          [icons/icon-mechanics]
          [:div.page-top
           [:h1 page-title]
-          [:p "Lorem ipsum"]
+          [:p.description "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin nibh augue, suscipit a, scelerisque sed, lacinia in, mi. Cras vel lorem. Etiam pellentesque aliquet tellus. Phasellus pharetra nulla ac diam. Quisque semper justo at risus. Donec venenatis, turpis vel hendrerit interdum, dui ligula ultricies purus, sed posuere libero dui id orci"]
           (if ?interval
-            [:p "Bidding and voting will be closed in " (:d ?interval) " days " (:h ?interval) " hours."]
-            [:p "Bidding and voting is closed."])]
+            [:p.bidding "Bidding and voting will be closed in " (:d ?interval) " days " (:h ?interval) " hours."]
+            [:p.bidding "Bidding and voting is closed."])]
 
          (into [:div.bids
                 [:h2 "Bids"]]
@@ -144,13 +144,13 @@
            {:on-click (fn [e]
                         (.preventDefault e)
                         (if (<= 0 (:bid/amount @form-data))
-                          (dispatch [::events/add-bid (merge {:task/id (:task/id task)} @form-data)])
+                                (dispatch [::events/add-bid (merge {:task/id (:task/id task)} @form-data)])
                           (js/alert "Bid amount has to be non-negative number.")))}
            "Submit"]]]))))
 
 (defn footer []
   [:div.footer
-   [icons/district0x-logo-with-slogan]
+   [icons/district0x-logo]
    [:p "A network of decentralised markets and communities. Create, operate, and govern. Powered by Ethereum, Aragon and IPFS."]
    [:p "Part of the district0x Network"]
    [:ul
@@ -187,7 +187,7 @@
        [notification-metamask]
        [notifications]
        [:div.top
-        [icons/district0x-logo-with-slogan]
+        [icons/district0x-logo]
         [:div.top-right
          [:span (format/format-token (bn/number @active-account-balance) {:token "DNT"})]
          [:div.accounts
