@@ -29,7 +29,7 @@
     (district-tasks/add-voter 1 1 {:from (nth accounts 2)})
     (district-tasks/add-voter 1 1 {:from (nth accounts 3)})
     (district-tasks/add-voter 1 1 {:from (nth accounts 4)})
-    (district-tasks/add-bid 1 "Joker" "http://localhost:8080" "Administrative bid 1.2." 300 {})
+    (district-tasks/add-bid 1 "Joker" "http://localhost:8080" "Administrative bid 1.2. Long description. Lorem ipsum dolor sit amet, consectetur adipiscing elit.\nProin nibh augue, suscipit a, scelerisque sed, lacinia in, mi.\nCras vel lorem. Etiam pellentesque aliquet tellus. Phasellus pharetra nulla ac diam. Quisque semper justo at risus. Donec venenatis, turpis vel hendrerit interdum, dui ligula ultricies purus, sed posuere libero dui id orci." 300 {})
     (district-tasks/add-bid 1 "John Smith" "" "Administrative bid 1.3<br /><b>foo</b>." 50 {})
     (district-tasks/add-task "Branding and Design" very-soon true {:from (last accounts)})
     (district-tasks/add-bid 2 "<b>bold</b>" "" "Branding and Design bid 2.0." 400 {})

@@ -53,7 +53,7 @@
 
 (defn percentage-line [p]
   [:div.votes-line
-   [:hr {:width (str p "%")}]
+   [:hr {:width p}]
    [:hr]])
 
 (defn find-page [route]
@@ -98,7 +98,7 @@
          [icons/icon-mechanics]
          [:div.page-top
           [:h1 page-title]
-          [:p.description "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin nibh augue, suscipit a, scelerisque sed, lacinia in, mi. Cras vel lorem. Etiam pellentesque aliquet tellus. Phasellus pharetra nulla ac diam. Quisque semper justo at risus. Donec venenatis, turpis vel hendrerit interdum, dui ligula ultricies purus, sed posuere libero dui id orci"]
+          [:p.description "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin nibh augue, suscipit a, scelerisque sed, lacinia in, mi. Cras vel lorem. Etiam pellentesque aliquet tellus. Phasellus pharetra nulla ac diam. Quisque semper justo at risus. Donec venenatis, turpis vel hendrerit interdum, dui ligula ultricies purus, sed posuere libero dui id orci."]
           (if ?interval
             [:p.bidding "Bidding and voting will be closed in " (:d ?interval) " days " (:h ?interval) " hours."]
             [:p.bidding "Bidding and voting is closed."])]
@@ -109,14 +109,15 @@
                      :let [p (-> (/ (:bid/votes-sum bid) bids-sum)
                                  (format-percentage))]]
                  [:div.bid
-                  [:a {:href (not-empty (:bid/url bid))} (:bid/title bid)]
-                  [:p (:bid/description bid)]
-                  [:p (:bid/amount bid)]
+                  [:div.info
+                   [:a {:href (not-empty (:bid/url bid))} (:bid/title bid)]
+                   [:span.amount (:bid/amount bid) " ETH"]]
+                  [:p.description (:bid/description bid)]
                   [percentage-line p]
                   [:p.votes-text (format/format-token (:bid/votes-sum bid) {:token "DNT"}) " (" p ")"]
                   (when ?interval
                     [inputs/pending-button
-                     {:class "vote"
+                     {:class "vote button"
                       :on-click (fn [e]
                                   (.preventDefault e)
                                   (dispatch [::events/voted?->add-voter bid]))}

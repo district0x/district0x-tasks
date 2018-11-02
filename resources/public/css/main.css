@@ -15,10 +15,15 @@ body {
 
 .button {
     border-radius:28px;
+    font-size: 13px;
+    padding: 10px 32px;
+    font-family: 'filson-soft';
     background-color: #2c398f;
     color: #69c9e0;
-    font-size: 13px;
-    line-height: 28px;
+    cursor: pointer;
+    -webkit-box-shadow: 0px 4px 0px 0px #E8EAF2;
+    -moz-box-shadow: 0px 4px 0px 0px #E8EAF2;
+    box-shadow: 0px 4px 0px 0px #E8EAF2;
 }
 
 /* notifications */
@@ -64,6 +69,8 @@ body {
 .top .top-right {
     display: flex;
     align-items: center;
+    font-size: 16px;
+    font-family: 'filson-soft';
     color: #2c398f;
 }
 
@@ -102,9 +109,9 @@ body {
     -moz-appearance: none;
     appearance: none;
 
-    -webkit-box-shadow: 0px 5px 0px 0px #E8EAF2;
-    -moz-box-shadow: 0px 5px 0px 0px #E8EAF2;
-    box-shadow: 0px 5px 0px 0px #E8EAF2;
+    -webkit-box-shadow: 0px 4px 0px 0px #E8EAF2;
+    -moz-box-shadow: 0px 4px 0px 0px #E8EAF2;
+    box-shadow: 0px 4px 0px 0px #E8EAF2;
 
     font-size: 14px;
     color: #c7cdd9;
@@ -190,32 +197,62 @@ body {
 .app-page .page-top {
     min-height: 300px;
     padding-left: 140px;
+    color: #47608e;
 }
 .app-page .page-top h1 {
-    margin-top: 0;
+    margin: 0;
+    font-size: 36px;
     font-family: 'filson-soft';
     font-weight: normal;
+    color: #232e80;
 }
 .app-page .page-top .description {
+    margin-top: 46px;
+    margin-bottom: 0px;
+    line-height: 32px;
+    font-size: 22px;
     font-family: 'proxima-soft';
 }
 .app-page .page-top .bidding {
+    margin-top: 46px;
+    margin-bottom: 48px;
+    font-size: 16px;
     font-family: 'proxima-soft';
     font-weight: 600;
 }
 
 /* page bids */
 
+.bids {
+    color: #47608e;
+}
+
 .bids h2 {
-    margin-top: 0;
+    margin-top: 0px;
+    margin-bottom: 16px;
     font-family: 'filson-soft';
     font-weight: normal;
 }
 .bids .bid {
+    line-height: 27px;
     font-family: 'proxima-soft';
+}
+.bids .bid:not(:first-of-type) {
+    margin-top: 140px;
 }
 .bids .bid a {
     font-weight: bold;
+    color: #47608e;
+    text-decoration-color: #d1d7e3;
+}
+.bids .bid .info {
+    display: flex;
+    justify-content: space-between;
+}
+.bids .bid .description {
+    margin-top: 0px;
+    margin-bottom: 36px;
+    white-space: pre-wrap;
 }
 
 .bids-form {
@@ -232,6 +269,7 @@ body {
 }
 
 .votes-line hr {
+    margin: 0;
     height: 9px;
     border: none;
     background-color: #394596;
@@ -244,7 +282,9 @@ body {
 }
 
 .votes-text {
-  text-align: center;
+    margin-top: 10px;
+    margin-bottom: 0px;
+    text-align: center;
 }
 
 button.vote {
