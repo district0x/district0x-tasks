@@ -173,7 +173,7 @@ body {
 .app-page {
   position: relative;
   flex-grow: 100;
-  padding: 98px 80px 70px 140px;
+  padding: 90px 80px 70px 140px;
   border-radius: 10px;
   -webkit-box-shadow: 0px 0px 120px 0px rgba(73,79,104,0.11);
   -moz-box-shadow: 0px 0px 120px 0px rgba(73,79,104,0.11);
@@ -188,10 +188,13 @@ body {
 }
 
 .app-page .page-top {
-  padding-left: 280px;
+    min-height: 300px;
+    padding-left: 140px;
 }
 .app-page .page-top h1 {
+    margin-top: 0;
     font-family: 'filson-soft';
+    font-weight: normal;
 }
 .app-page .page-top .description {
     font-family: 'proxima-soft';
@@ -204,7 +207,9 @@ body {
 /* page bids */
 
 .bids h2 {
+    margin-top: 0;
     font-family: 'filson-soft';
+    font-weight: normal;
 }
 .bids .bid {
     font-family: 'proxima-soft';
@@ -227,13 +232,15 @@ body {
 }
 
 .votes-line hr {
-  flex-grow: 1;
-  height: 9px;
-  border: none;
-  background-color: #394596;
+    height: 9px;
+    border: none;
+    background-color: #394596;
 }
 .votes-line hr:first-child {
-  background-color: #04ffcc;
+    background-color: #04ffcc;
+}
+.votes-line hr:last-child {
+    flex-grow: 1;
 }
 
 .votes-text {

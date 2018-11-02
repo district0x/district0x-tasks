@@ -51,6 +51,11 @@
   (->> (* p 100)
        (r-format/format "%.2f%")))
 
+(defn percentage-line [p]
+  [:div.votes-line
+   [:hr {:width (str p "%")}]
+   [:hr]])
+
 (defn find-page [route]
   (filter #(= route (:route %)) pages))
 
@@ -100,15 +105,15 @@
 
          (into [:div.bids
                 [:h2 "Bids"]]
-               (for [bid bids]
+               (for [bid bids
+                     :let [p (-> (/ (:bid/votes-sum bid) bids-sum)
+                                 (format-percentage))]]
                  [:div.bid
                   [:a {:href (not-empty (:bid/url bid))} (:bid/title bid)]
                   [:p (:bid/description bid)]
                   [:p (:bid/amount bid)]
-                  [:div.votes-line
-                   [:hr {:width "30%"}]
-                   [:hr]]
-                  [:p.votes-text (format/format-token (:bid/votes-sum bid) {:token "DNT"}) " (" (format-percentage (/ (:bid/votes-sum bid) bids-sum)) ")"]
+                  [percentage-line p]
+                  [:p.votes-text (format/format-token (:bid/votes-sum bid) {:token "DNT"}) " (" p ")"]
                   (when ?interval
                     [inputs/pending-button
                      {:class "vote"
@@ -144,7 +149,7 @@
            {:on-click (fn [e]
                         (.preventDefault e)
                         (if (<= 0 (:bid/amount @form-data))
-                                (dispatch [::events/add-bid (merge {:task/id (:task/id task)} @form-data)])
+                          (dispatch [::events/add-bid (merge {:task/id (:task/id task)} @form-data)])
                           (js/alert "Bid amount has to be non-negative number.")))}
            "Submit"]]]))))
 
