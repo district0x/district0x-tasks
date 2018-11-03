@@ -115,13 +115,14 @@
                   [:p.description (:bid/description bid)]
                   [percentage-line p]
                   [:p.votes-text (format/format-token (:bid/votes-sum bid) {:token "DNT"}) " (" p ")"]
-                  (when ?interval
-                    [inputs/pending-button
-                     {:class "vote button"
-                      :on-click (fn [e]
-                                  (.preventDefault e)
-                                  (dispatch [::events/voted?->add-voter bid]))}
-                     "Vote"])]))
+                  [:div.vote
+                   (when ?interval
+                     [inputs/pending-button
+                      {:class "button"
+                       :on-click (fn [e]
+                                   (.preventDefault e)
+                                   (dispatch [::events/voted?->add-voter bid]))}
+                      "Vote"])]]))
 
          [:div.bids-form
           [:h2 "Submit a Bid"]
@@ -147,27 +148,30 @@
                                   :rows 10
                                   :cols 40}]
           [inputs/pending-button
-           {:on-click (fn [e]
+           {:class "button"
+            :on-click (fn [e]
                         (.preventDefault e)
                         (if (<= 0 (:bid/amount @form-data))
                           (dispatch [::events/add-bid (merge {:task/id (:task/id task)} @form-data)])
                           (js/alert "Bid amount has to be non-negative number.")))}
            "Submit"]]]))))
 
+;;; todo form, footer
+
 (defn footer []
   [:div.footer
    [icons/district0x-logo]
-   [:p "A network of decentralised markets and communities. Create, operate, and govern. Powered by Ethereum, Aragon and IPFS."]
-   [:p "Part of the district0x Network"]
+   [:p.description "A network of decentralised markets and communities. Create, operate, and govern. Powered by Ethereum, Aragon and IPFS."]
+   [:p.district0x-network "Part of the " [:a {:href "http://district0x.io"} "district0x Network"]]
    [:ul
-    [:li "Blog"]
-    [:li "Team"]
-    [:li "Transparency"]
-    [:li "FAQ"]]
-   [:button.icon-reddit]
-   [:button.icon-twitter]
-   [:button.icon-medium]
-   [:button.icon-github]])
+    [:li [:a {:href "https://blog.district0x.io/"} "Blog"]]
+    [:li [:a {:href "https://district0x.io/team/"} "Team"]]
+    [:li [:a {:href "https://district0x.io/transparency/"} "Transparency"]]
+    [:li [:a {:href "https://district0x.io/faq/"} "FAQ"]]]
+   [:a.icon-reddit.button {:href "https://www.reddit.com/r/district0x"}]
+   [:a.icon-twitter.button {:href "https://twitter.com/district0x"}]
+   [:a.icon-medium.button {:href ""}]
+   [:a.icon-github.button {:href "https://github.com/district0x"}]])
 
 (defn notification-metamask []
   (let [active-account (subscribe [::accounts-subs/active-account])]
