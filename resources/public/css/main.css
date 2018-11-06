@@ -1,5 +1,6 @@
 body {
     margin: 0;
+    margin-bottom: 70px;
     font-family: 'sans-serif';
 }
 
@@ -116,8 +117,9 @@ body {
 /* menu and page */
 
 .app-content {
-  display: flex;
-  justify-content: space-between;
+    margin-right: 190px;
+    display: flex;
+    justify-content: space-between;
 }
 
 /* menu */
@@ -295,12 +297,21 @@ body {
 /* footer */
 
 .footer {
-    margin-top: 64px;
-    margin-left: 410px;
+    margin: 64px 190px 0px 410px;
     font-family: 'filson-soft';
     color: #47608e;
 }
+.footer .footer-container {
+    margin-top: 25px;
+    display: flex;
+    justify-content: space-between;
+}
+.footer .about-district0x {
+    /*max-width: 380px;*/
+}
+
 .footer .description {
+    margin-top: 0;
     font-size: 18px;
     line-height: 32px;
 }
@@ -312,7 +323,8 @@ body {
     text-decoration-color: #d1d7e3;
 }
 .footer ul {
-    padding: 0px;
+    margin: 0;
+    padding: 0 100px;
 }
 .footer ul a {
     font-size: 13px;
@@ -323,6 +335,10 @@ body {
 }
 .footer ul li {
     list-style-type: none;
+}
+
+.footer .icons {
+    flex-shrink: 0;
 }
 .footer .button {
     display: inline-block;

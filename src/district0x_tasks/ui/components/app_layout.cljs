@@ -161,17 +161,20 @@
 (defn footer []
   [:div.footer
    [icons/district0x-logo]
-   [:p.description "A network of decentralised markets and communities. Create, operate, and govern. Powered by Ethereum, Aragon and IPFS."]
-   [:p.district0x-network "Part of the " [:a {:href "http://district0x.io"} "district0x Network"]]
-   [:ul
-    [:li [:a {:href "https://blog.district0x.io/"} "Blog"]]
-    [:li [:a {:href "https://district0x.io/team/"} "Team"]]
-    [:li [:a {:href "https://district0x.io/transparency/"} "Transparency"]]
-    [:li [:a {:href "https://district0x.io/faq/"} "FAQ"]]]
-   [:a.icon-reddit.button {:href "https://www.reddit.com/r/district0x"}]
-   [:a.icon-twitter.button {:href "https://twitter.com/district0x"}]
-   [:a.icon-medium.button {:href ""}]
-   [:a.icon-github.button {:href "https://github.com/district0x"}]])
+   [:div.footer-container
+    [:div.about-district0x
+     [:p.description "A network of decentralised markets and communities. Create, operate, and govern. Powered by Ethereum, Aragon and IPFS."]
+     [:p.district0x-network "Part of the " [:a {:href "http://district0x.io"} "district0x Network"]]]
+    [:ul
+     [:li [:a {:href "https://blog.district0x.io/"} "Blog"]]
+     [:li [:a {:href "https://district0x.io/team/"} "Team"]]
+     [:li [:a {:href "https://district0x.io/transparency/"} "Transparency"]]
+     [:li [:a {:href "https://district0x.io/faq/"} "FAQ"]]]
+    [:div.icons
+     [:a.icon-reddit.button {:href "https://www.reddit.com/r/district0x"}]
+     [:a.icon-twitter.button {:href "https://twitter.com/district0x"}]
+     [:a.icon-medium.button {:href ""}]
+     [:a.icon-github.button {:href "https://github.com/district0x"}]]]])
 
 (defn notification-metamask []
   (let [active-account (subscribe [::accounts-subs/active-account])]
