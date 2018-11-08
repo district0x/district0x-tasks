@@ -129,7 +129,6 @@
           [:div.form-container
            [:div.left
             [inputs/text-input {:form-data form-data
-                                :required true
                                 :id :bid/title
                                 :placeholder "Name"}]
             [inputs/text-input {:form-data form-data
@@ -138,13 +137,11 @@
                                 :placeholder "Website URL"}]
             [:div.amount [inputs/text-input {:form-data form-data
                                              :type :number
-                                             :required true
                                              :id :bid/amount
                                              :min 0
                                              :step 0.01
                                              :placeholder "Bid"}]]]
            [inputs/textarea-input {:form-data form-data
-                                   :required true
                                    :id :bid/description
                                    :placeholder "Description"
                                    :rows 10

@@ -5,6 +5,7 @@ body {
 }
 
 .button {
+    border: none; /* Firefox */
     border-radius:28px;
     font-size: 13px;
     padding: 10px 32px;
