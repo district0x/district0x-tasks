@@ -126,27 +126,29 @@
 
          [:div.bids-form
           [:h2 "Submit a Bid"]
-          [inputs/text-input {:form-data form-data
-                              :required true
-                              :id :bid/title
-                              :placeholder "Name"}]
-          [inputs/text-input {:form-data form-data
-                              :type :url
-                              :id :bid/url
-                              :placeholder "Website URL"}]
-          [inputs/text-input {:form-data form-data
-                              :type :number
-                              :required true
-                              :id :bid/amount
-                              :min 0
-                              :step 0.01
-                              :placeholder "Bid"}]
-          [inputs/textarea-input {:form-data form-data
-                                  :required true
-                                  :id :bid/description
-                                  :placeholder "Description"
-                                  :rows 10
-                                  :cols 40}]
+          [:div.form-container
+           [:div.left
+            [inputs/text-input {:form-data form-data
+                                :required true
+                                :id :bid/title
+                                :placeholder "Name"}]
+            [inputs/text-input {:form-data form-data
+                                :type :url
+                                :id :bid/url
+                                :placeholder "Website URL"}]
+            [:div.amount [inputs/text-input {:form-data form-data
+                                             :type :number
+                                             :required true
+                                             :id :bid/amount
+                                             :min 0
+                                             :step 0.01
+                                             :placeholder "Bid"}]]]
+           [inputs/textarea-input {:form-data form-data
+                                   :required true
+                                   :id :bid/description
+                                   :placeholder "Description"
+                                   :rows 10
+                                   :cols 40}]]
           [inputs/pending-button
            {:class "button"
             :on-click (fn [e]
@@ -162,7 +164,7 @@
   [:div.footer
    [icons/district0x-logo]
    [:div.footer-container
-    [:div.about-district0x
+    [:div
      [:p.description "A network of decentralised markets and communities. Create, operate, and govern. Powered by Ethereum, Aragon and IPFS."]
      [:p.district0x-network "Part of the " [:a {:href "http://district0x.io"} "district0x Network"]]]
     [:ul

@@ -255,6 +255,7 @@ body {
     color: #47608e;
 }
 .bids-form h2 {
+    margin-bottom: 40px;
     font-size: 23px;
     font-family: 'filson-soft';
     font-weight: normal;
@@ -262,6 +263,61 @@ body {
 .bids-form .button {
     padding: 14px 48px;
     font-size: 18px;
+}
+
+
+.bids-form .form-container {
+    display: flex;
+    justify-content: space-between;
+}
+.bids-form .left {
+    width: 100%;
+    max-width: 410px;
+    margin-bottom: 6px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.bids-form input {
+    width: 100%;
+    border-width: 0 0 1px 0;
+    border-color: #E0DFE6;
+
+    font-family: 'filson-soft';
+    font-size: 14px;
+    line-height: 30px;
+}
+.bids-form .form-container > .input-group {
+    flex-grow: 2;
+    margin-left: 35px;
+}
+.bids-form textarea {
+    box-sizing: border-box;
+    width: 100%;
+    height: 165px;
+    padding: 22px;
+    border: none;
+    border-radius: 10px;
+    background-color: #F6F5FA;
+}
+.bids-form .amount input {
+    width: calc(100% - 40px);
+    padding-right: 40px;
+}
+.bids-form .amount {
+    position: relative;
+}
+.bids-form .amount:after {
+    position: absolute;
+    top: 8px;
+    right: 0;
+    content: "ETH";
+}
+.bids-form .unit {
+    display: inline;
+}
+.bids-form .button {
+    float: right;
 }
 
 /* votes-line */
@@ -305,9 +361,6 @@ body {
     margin-top: 25px;
     display: flex;
     justify-content: space-between;
-}
-.footer .about-district0x {
-    /*max-width: 380px;*/
 }
 
 .footer .description {
