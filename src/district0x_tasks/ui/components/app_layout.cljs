@@ -24,27 +24,35 @@
 (def pages
   [{:route :route.administrative/index
     :title "Administrative"
+    :description "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin nibh augue, suscipit a, scelerisque sed, lacinia in, mi. Cras vel lorem. Etiam pellentesque aliquet tellus. Phasellus pharetra nulla ac diam. Quisque semper justo at risus. Donec venenatis, turpis vel hendrerit interdum, dui ligula ultricies purus, sed posuere libero dui id orci."
     :icon "icon-document"}
    {:route :route.branding-and-design/index
     :title "Branding and Design"
+    :description "Nice look"
     :icon "icon-pencil-ruler"}
    {:route :route.community-and-marketing/index
     :title "Community and Marketing"
+    :description "Marketing"
     :icon "icon-thumb-up"}
    {:route :route.d0xinfra/index
     :title "d0xINFRA"
+    :description "Infra"
     :icon "icon-circles"}
    {:route :route.district-registry/index
     :title "District Registry"
+    :description "Registry"
     :icon "icon-registry"}
    {:route :route.meme-factory/index
     :title "Meme Factory"
+    :description "Factor of Art"
     :icon "icon-arrow-up"}
    {:route :route.next-district/index
     :title "Next District"
+    :description "Feature starts here"
     :icon "icon-double-arrow-right"}
    {:route :route.about/index
     :title "About"
+    :description "About district0x"
     :icon "icon-settings"}])
 
 (defn format-percentage [p]
@@ -57,7 +65,8 @@
    [:hr]])
 
 (defn find-page [route]
-  (filter #(= route (:route %)) pages))
+  (-> (filter #(= route (:route %)) pages)
+      (first)))
 
 (defn menu-item [{:keys [route title icon]}]
   [:li
@@ -71,10 +80,9 @@
    (into [:ul] (map #(menu-item %) pages))])
 
 (defn page []
-  (let [page-title (-> @(subscribe [::router-subs/active-page])
-                       :name
+  (let [route  (subscribe [::router-subs/active-page])
+        page-title (-> (:name @route)
                        (find-page)
-                       (first)
                        :title)
         task-raw (re-frame/subscribe [::gql/query
                                       {:queries
@@ -93,12 +101,15 @@
                                     (t/after? (t/now)))
                         (let [interval-raw (t/interval (t/now) (:task/bidding-ends-on task))]
                           {:d (t/in-days interval-raw)
-                           :h (mod (t/in-hours interval-raw) 24)}))]
+                           :h (mod (t/in-hours interval-raw) 24)}))
+            description (-> (:name @route)
+                            (find-page)
+                            :description)]
         [:div.app-page
          [icons/icon-mechanics]
          [:div.page-top
           [:h1 page-title]
-          [:p.description "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin nibh augue, suscipit a, scelerisque sed, lacinia in, mi. Cras vel lorem. Etiam pellentesque aliquet tellus. Phasellus pharetra nulla ac diam. Quisque semper justo at risus. Donec venenatis, turpis vel hendrerit interdum, dui ligula ultricies purus, sed posuere libero dui id orci."]
+          [:p.description description]
           (if ?interval
             [:p.bidding "Bidding and voting will be closed in " (:d ?interval) " days " (:h ?interval) " hours."]
             [:p.bidding "Bidding and voting is closed."])]
@@ -155,8 +166,6 @@
                           (js/alert "Bid amount has to be non-negative number.")))}
            "Submit"]]]))))
 
-;;; todo form, footer
-
 (defn footer []
   [:div.footer
    [icons/district0x-logo]
@@ -172,7 +181,7 @@
     [:div.icons
      [:a.icon-reddit.button {:href "https://www.reddit.com/r/district0x"}]
      [:a.icon-twitter.button {:href "https://twitter.com/district0x"}]
-     [:a.icon-medium.button {:href ""}]
+     [:a.icon-medium.button {:href "https://blog.district0x.io/"}]
      [:a.icon-github.button {:href "https://github.com/district0x"}]]]])
 
 (defn notification-metamask []
