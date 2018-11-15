@@ -1,0 +1,22 @@
+FROM district0x/base as dependencies
+WORKDIR /app
+COPY project.clj .
+RUN lein deps
+
+FROM dependencies as dependencies-full
+WORKDIR /app
+COPY . .
+
+FROM dependencies-full as builder
+WORKDIR /app
+RUN lein solc once
+RUN lein cljsbuild once "server"
+
+FROM district0x/base
+EXPOSE 6500
+WORKDIR /app
+COPY --from=builder /server/ ./
+CMD ["node", "district0x-tasks.js"]
+
+HEALTHCHECK --interval=5m --timeout=3s --retries=3 \
+    CMD curl --output /dev/null --silent --head --fail -k http://localhost:6500/graphql || exit 1
