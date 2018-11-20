@@ -3,7 +3,7 @@
 (def smart-contracts 
 {:district-tasks
  {:name "DistrictTasks",
-  :address "0x74fc6891ef3c2b4d22f594fdd9dea5c9f1a123a9"},
+  :address "0xfc337cef3e5c38493bf2aad12eb03d57a213128d"},
  :mini-me-token
  {:name "MiniMeToken",
-  :address "0x2a869142f6b6547e711150175d64fe8296aa18ec"}})
+  :address "0x9b23f3a2ddd4b3fc7d38ab92e0ff9a8538fcebe6"}})
