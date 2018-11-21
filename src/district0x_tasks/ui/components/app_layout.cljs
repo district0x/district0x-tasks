@@ -80,7 +80,7 @@
    (into [:ul] (map #(menu-item %) pages))])
 
 (defn page []
-  (let [route  (subscribe [::router-subs/active-page])
+  (let [route (subscribe [::router-subs/active-page])
         page-title (-> (:name @route)
                        (find-page)
                        :title)
@@ -135,36 +135,37 @@
                                    (dispatch [::events/voted?->add-voter bid]))}
                       "Vote"])]]))
 
-         [:div.bids-form
-          [:h2 "Submit a Bid"]
-          [:div.form-container
-           [:div.left
-            [inputs/text-input {:form-data form-data
-                                :id :bid/title
-                                :placeholder "Name"}]
-            [inputs/text-input {:form-data form-data
-                                :type :url
-                                :id :bid/url
-                                :placeholder "Website URL"}]
-            [:div.amount [inputs/text-input {:form-data form-data
-                                             :type :number
-                                             :id :bid/amount
-                                             :min 0
-                                             :step 0.01
-                                             :placeholder "Bid"}]]]
-           [inputs/textarea-input {:form-data form-data
-                                   :id :bid/description
-                                   :placeholder "Description"
-                                   :rows 10
-                                   :cols 40}]]
-          [inputs/pending-button
-           {:class "button"
-            :on-click (fn [e]
-                        (.preventDefault e)
-                        (if (<= 0 (:bid/amount @form-data))
-                          (dispatch [::events/add-bid (merge {:task/id (:task/id task)} @form-data)])
-                          (js/alert "Bid amount has to be non-negative number.")))}
-           "Submit"]]]))))
+         (when ?interval
+           [:div.bids-form
+            [:h2 "Submit a Bid"]
+            [:div.form-container
+             [:div.left
+              [inputs/text-input {:form-data form-data
+                                  :id :bid/title
+                                  :placeholder "Name"}]
+              [inputs/text-input {:form-data form-data
+                                  :type :url
+                                  :id :bid/url
+                                  :placeholder "Website URL"}]
+              [:div.amount [inputs/text-input {:form-data form-data
+                                               :type :number
+                                               :id :bid/amount
+                                               :min 0
+                                               :step 0.01
+                                               :placeholder "Bid"}]]]
+             [inputs/textarea-input {:form-data form-data
+                                     :id :bid/description
+                                     :placeholder "Description"
+                                     :rows 10
+                                     :cols 40}]]
+            [inputs/pending-button
+             {:class "button"
+              :on-click (fn [e]
+                          (.preventDefault e)
+                          (if (<= 0 (:bid/amount @form-data))
+                            (dispatch [::events/add-bid (merge {:task/id (:task/id task)} @form-data)])
+                            (js/alert "Bid amount has to be non-negative number.")))}
+             "Submit"]])]))))
 
 (defn footer []
   [:div.footer
