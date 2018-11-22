@@ -10,7 +10,7 @@
     [district.server.smart-contracts :refer [contract-call]]))
 
 (defn deploy-tasks-contract! [default-opts]
-  (deploy-smart-contract! :district-tasks (merge default-opts {:gas 2000000})))
+  (deploy-smart-contract! :district-tasks (merge default-opts {:gas 1500000})))
 
 (defn deploy-mini-me-token-contract! [default-opts]
   (deploy-smart-contract! :mini-me-token (merge default-opts {:gas 2000000})))
