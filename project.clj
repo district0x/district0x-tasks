@@ -86,7 +86,8 @@
                        [graphql-fields "1.0.2"]
                        [solc "0.4.24"]
                        [source-map-support "0.5.3"]
-                       [ws "4.0.0"]]}
+                       [ws "4.0.0"]
+                       [chalk "2.4.1"]]}
 
   :solc {:src-path "resources/public/contracts/src"
          :build-path "resources/public/contracts/build"
