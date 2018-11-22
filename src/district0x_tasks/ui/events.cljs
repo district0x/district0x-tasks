@@ -14,7 +14,7 @@
                                      :args [(:task/id bid) (:bid/title bid) (or (:bid/url bid) "") (:bid/description bid) (* 100 (float (:bid/amount bid)))]
                                      :tx-opts {:from (account-queries/active-account db)}
                                      :on-tx-success-n [[::logging/success [id]]
-                                                       [::notification-events/show {:type :success :message "Bid sent."}]]
+                                                       [::notification-events/show {:type :success :message "Bid sent to the network. It can take a few minutes."}]]
                                      :on-tx-error-n [[::logging/error [id]]
                                                      [::notification-events/show "Unknown error during add bid."]]
                                      :on-tx-hash-error [::logging/error [id]]}]}))
@@ -29,7 +29,7 @@
                                        :tx-opts {:from (account-queries/active-account db)
                                                  :gas 90000}
                                        :on-tx-success-n [[::logging/success [id]]
-                                                         [::notification-events/show {:type :success :message "Vote sent."}]]
+                                                         [::notification-events/show {:type :success :message "Vote sent to the network. It can take a few minutes."}]]
                                        :on-tx-error-n [[::logging/error [id]]
                                                        [::notification-events/show "Unknown error during voting."]]
                                        :on-tx-hash-error [::logging/error [id]]}]}
