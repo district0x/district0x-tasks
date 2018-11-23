@@ -71,8 +71,8 @@
 (defn menu-item [{:keys [route title icon]}]
   [:li
    [:a
-    {:class icon
-     :href (utils/path route)}
+    {:href (utils/path route)}
+    [:span {:class icon}]
     title]])
 
 (defn menu []
