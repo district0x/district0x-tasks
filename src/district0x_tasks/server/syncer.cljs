@@ -66,13 +66,14 @@
   (update-voter-tokens (:_to args)))
 
 (defn dispatch-event [contract-key err event]
-  (log/info "Dispatching " event)
-  (let [event (cond-> (merge event
-                             (-> (web3-eth/get-block @web3 (:block-hash event) false)
-                                 (select-keys [:number :timestamp])
-                                 (rename-keys {:number :block-number})))
-                      (= contract-key :district-tasks) (district-tasks/event->cljs))]
-    (process-event event)))
+  (log/debug "Dispatching " err event)
+  (when (and (not err) event)
+    (let [event (cond-> (merge event
+                               (-> (web3-eth/get-block @web3 (:block-hash event) false)
+                                   (select-keys [:number :timestamp])
+                                   (rename-keys {:number :block-number})))
+                        (= contract-key :district-tasks) (district-tasks/event->cljs))]
+      (process-event event))))
 
 (declare start)
 (declare stop)
