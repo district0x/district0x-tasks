@@ -1,6 +1,7 @@
 FROM district0x/base as dependencies
 WORKDIR /app
 COPY project.clj .
+COPY resources/libs resources/libs
 RUN lein deps
 
 FROM dependencies as dependencies-full
@@ -15,7 +16,7 @@ RUN lein cljsbuild once "server"
 FROM district0x/base
 EXPOSE 6500
 WORKDIR /app
-COPY --from=builder /server/ ./
+COPY --from=builder /app/server .
 CMD ["node", "district0x-tasks.js"]
 
 HEALTHCHECK --interval=5m --timeout=3s --retries=3 \

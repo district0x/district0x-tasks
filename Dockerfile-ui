@@ -1,6 +1,7 @@
 FROM district0x/base as dependencies
 WORKDIR /app
 COPY project.clj .
+COPY resources/libs resources/libs
 RUN lein deps
 
 FROM dependencies as dependencies-full
@@ -22,7 +23,7 @@ RUN apt-get update -y \
 #COPY district0x-tasks.io /etc/nginx/sites-available/district0x-tasks.io
 #RUN ln -s -f /etc/nginx/sites-available/district0x-tasks.io /etc/nginx/sites-enabled/district0x-tasks.io
 WORKDIR /app
-COPY --from=builder /server/ ./
+COPY --from=builder /app/ .
 CMD ["nginx", "-g", "daemon off;"]
 
 HEALTHCHECK --interval=5m --timeout=3s --retries=3 \

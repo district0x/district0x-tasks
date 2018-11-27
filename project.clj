@@ -65,7 +65,8 @@
                  [garden "1.3.5"]
                  [akiroz.re-frame/storage "0.1.2"]]
 
-  :exclusions [express-graphql]
+  :exclusions [express-graphql
+               cljsjs/react-with-addons]
 
   :plugins [[lein-auto "0.1.2"]
             [lein-cljsbuild "1.1.7"]
@@ -157,7 +158,7 @@
                                                      district0x-tasks.ui.core.server-config-url "http://localhost:6400/config"}
                                    :external-config {:devtools/config {:features-to-install :all}}}}
                        {:id "server"
-                        :source-paths ["src"]
+                        :source-paths ["src/district0x_tasks/server" "src/district0x_tasks/shared"]
                         :compiler {:main "district0x-tasks.server.core"
                                    :output-to "server/district0x-tasks.js"
                                    :output-dir "server"
@@ -167,7 +168,7 @@
                                    :closure-defines {goog.DEBUG false}
                                    :pretty-print false}}
                        {:id "ui"
-                        :source-paths ["src"]
+                        :source-paths ["src/district0x_tasks/ui" "src/district0x_tasks/shared"]
                         :compiler {:main "district0x-tasks.ui.core"
                                    :output-to "resources/public/js/compiled/app.js"
                                    :optimizations :advanced
