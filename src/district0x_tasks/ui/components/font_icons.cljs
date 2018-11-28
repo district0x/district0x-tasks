@@ -1,4 +1,4 @@
-(ns district.ui.component.font-icons)
+(ns district0x-tasks.ui.components.font-icons)
 
 (defn icon-paths [n]
   (->> (range 1 (inc n))

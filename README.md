@@ -44,3 +44,7 @@ If change contracts code:
 lein solc auto
 ```
 Remember this doesn't trigger cljs tests. So you have to change cljs tests files to trigger. For example add new line.
+
+# QA env and Dockerfiles
+
+See docker-compose file in https://github.com/district0x/pipelines
