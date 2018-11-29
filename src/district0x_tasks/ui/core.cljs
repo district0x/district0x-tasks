@@ -31,10 +31,23 @@
 
 (def debug? ^boolean js/goog.DEBUG)
 
+(goog-define environment "")
+
 (defn dev-setup []
   (when debug?
     (enable-console-print!)
     (enable-re-frisk!)))
+
+(def env-conf {"prod" {:logging {:level "warn"}
+                       :web3 {:url "http://qa.district0x.io:8545"}
+                       :graphql {:schema graphql-schema
+                                 :url "http://qa.district0x.io:6301/graphql"}}
+               "docker" {:logging {:level "debug"
+                                :console? true}
+                      :web3 {:url "http://host.docker.internal:8545"}
+                      :graphql {:schema graphql-schema
+                                :url "http://localhost:6300/graphql"}}
+               "" {}})
 
 (defn ^:export init []
   (s/check-asserts debug?)
@@ -52,5 +65,6 @@
                          :default-route :route.administrative/index}
                 :router-google-analytics {:enabled? (not debug?)}
                 :graphql {:schema graphql-schema
-                          :url "http://localhost:6500/graphql"}}))
+                          :url "http://localhost:6500/graphql"}}
+               (get env-conf environment)))
       (mount/start)))
