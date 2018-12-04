@@ -63,6 +63,7 @@
                  [print-foo-cljs "2.0.3"]
                  [re-frame "0.10.5"]
                  [garden "1.3.5"]
+                 [stylefy "1.10.1"]
                  [akiroz.re-frame/storage "0.1.2"]]
 
   :exclusions [express-graphql
@@ -75,8 +76,7 @@
             [lein-solc "1.0.1"]
             [lein-doo "0.1.10"]
             [lein-npm "0.6.2"]
-            [lein-pdo "0.1.1"]
-            [lein-garden "0.3.0"]]
+            [lein-pdo "0.1.1"]]
 
   :npm {:dependencies [;; needed until v0.6.13 is officially released
                        [express-graphql "./resources/libs/express-graphql-0.6.13.tgz"]

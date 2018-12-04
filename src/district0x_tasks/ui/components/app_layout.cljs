@@ -18,7 +18,9 @@
     [district.format :as format]
     [reagent.format :as r-format]
     [cljs-web3.core :as web3]
-    [bignumber.core :as bn])
+    [bignumber.core :as bn]
+    [district0x-tasks.ui.components.styles :as styles]
+    [stylefy.core :refer [use-style use-sub-style]])
   (:require-macros [reagent.ratom :refer [reaction]]))
 
 (def pages
@@ -60,24 +62,27 @@
        (r-format/format "%.2f%")))
 
 (defn percentage-line [p]
-  [:div.votes-line
-   [:hr {:width p}]
-   [:hr]])
+  [:div (use-style styles/votes-line)
+   [:hr (use-sub-style styles/votes-line :hr
+                       {:width p})]
+   [:hr (use-sub-style styles/votes-line :hr)]])
 
 (defn find-page [route]
   (-> (filter #(= route (:route %)) pages)
       (first)))
 
 (defn menu-item [{:keys [route title icon]}]
-  [:li
-   [:a
-    {:href (utils/path route)}
-    [:span {:class icon}]
+  [:li (use-sub-style styles/menu :item)
+   [:a (use-sub-style styles/menu :item-link
+                      {:href (utils/path route)})
+    [:span (use-sub-style styles/menu :icon
+                          {:class icon})]
     title]])
 
 (defn menu []
-  [:div.app-menu
-   (into [:ul] (map #(menu-item %) pages))])
+  [:div (use-style styles/menu)
+   (->> (map #(menu-item %) pages)
+        (into [:ul (use-sub-style styles/menu :list)]))])
 
 (defn page []
   (let [route (subscribe [::router-subs/active-page])
@@ -208,17 +213,17 @@
       [:div.app-container
        [notification-metamask]
        [notifications]
-       [:div.top
+       [:div (use-style styles/top-bar)
         [icons/district0x-logo]
-        [:div.top-right
+        [:div (use-sub-style styles/top-bar :right)
          [:span (format/format-token (bn/number @active-account-balance) {:token "DNT"})]
          [:div.accounts
-          [:div.icon-select-address
-           (into [:select
-                  {:on-click #(dispatch [::events/notification-no-accounts])
-                   :value (str @active-account)
-                   :on-change (fn [event]
-                                (dispatch [::accounts-events/set-active-account event.target.value]))}]
+          [:div.icon-prefix (use-style styles/select-account)
+           (into [:select (use-sub-style styles/select-account :select
+                                         {:on-click #(dispatch [::events/notification-no-accounts])
+                                          :value (str @active-account)
+                                          :on-change (fn [event]
+                                                       (dispatch [::accounts-events/set-active-account event.target.value]))})]
                  (for [account @accounts]
                    [:option account]))]]]]
        [:div.app-content

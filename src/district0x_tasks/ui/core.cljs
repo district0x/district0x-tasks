@@ -27,7 +27,8 @@
     [mount.core :as mount]
     [print.foo :include-macros true]
     [re-frisk.core :refer [enable-re-frisk!]]
-    [re-frame.core :as re-frame]))
+    [re-frame.core :as re-frame]
+    [stylefy.core :as stylefy]))
 
 (def debug? ^boolean js/goog.DEBUG)
 
@@ -43,15 +44,21 @@
                        :graphql {:schema graphql-schema
                                  :url "http://qa.district0x.io:6301/graphql"}}
                "docker" {:logging {:level "debug"
-                                :console? true}
-                      :web3 {:url "http://host.docker.internal:8545"}
-                      :graphql {:schema graphql-schema
-                                :url "http://localhost:6300/graphql"}}
+                                   :console? true}
+                         :web3 {:url "http://host.docker.internal:8545"}
+                         :graphql {:schema graphql-schema
+                                   :url "http://localhost:6300/graphql"}}
                "" {}})
 
 (defn ^:export init []
   (s/check-asserts debug?)
   (dev-setup)
+  (stylefy/init {:global-vendor-prefixes {::stylefy/vendors ["webkit" "moz" "o"]
+                                          ::stylefy/auto-prefix #{:box-shadow :appearance}}})
+  (stylefy/tag "body" {:min-width "1250px"
+                       :margin 0
+                       :margin-bottom "70px"
+                       :font-family "sans-serif"})
   (-> (mount/with-args
         (merge {:web3 {:url "http://localhost:8545"}
                 :smart-contracts {:contracts smart-contracts}
