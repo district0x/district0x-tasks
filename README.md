@@ -26,6 +26,7 @@ node dev-server/district0x-tasks.js
 
 Start UI:
 ```bash
+lein garden once
 lein repl
 (start-ui!)
 # go to http://localhost:4598/
