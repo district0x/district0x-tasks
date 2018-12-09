@@ -283,3 +283,6 @@
   margin-left: -0.3984375em;
   color: rgb(45, 57, 143);
 }
+.icon-menu:before {
+  content: "\e9bd";
+}
