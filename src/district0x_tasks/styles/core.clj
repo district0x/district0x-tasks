@@ -1,21 +1,27 @@
 (ns district0x-tasks.styles.core
-  (:require [garden.def :refer [defstyles]]))
+  (:require [garden.def :refer [defstyles]]
+            [district0x-tasks.styles.base.media :as media]
+            [garden.units :refer [rem px em]]))
+
+(def primary-color "#2c398f")
+(def secondary-color "#47608e")
+(def third-color "#23fdd8")
 
 (defstyles notification
-           [:.notification {:position "fixed"
+           [:.notification {:box-sizing "border-box"
+                            :position "fixed"
                             :width "100%"
                             :padding "30px"
                             :text-align "center"
                             :background-color "#FFFDE7"
                             :z-index 1
                             :font-size "18px"}
+            (media/max-tablet {:display "none"})
             [:.success {:background-color "#C5E1A5"}]]
-           [:.notification-metamask {:width "100%"
-                                     :padding "10px"
-                                     :text-align "center"
-                                     :background-color "#E1F5FE"
-                                     :z-index 1
-                                     :font-size "18px"}])
+           [:.notification-metamask {:position "static"
+                                     :background-color "#E1F5FE"}])
+
+(println (media/max-tablet [:& {:display "none"}]))
 
 (defstyles top
            [:.top {:margin-bottom "66px"
@@ -28,30 +34,32 @@
                    :-webkit-box-shadow "0px 0px 120px 0px rgba(73, 79, 104, 0.11)"
                    :-moz-box-shadow "0px 0px 120px 0px rgba(73, 79, 104, 0.11)"
                    :box-shadow "0px 0px 120px 0px rgba(73, 79, 104, 0.11)"}
+            (media/max-tablet {:display "none"})
             [:.top-right {:display "flex"
                           :align-items "center"
                           :font-size "16px"
                           :font-family "'filson-soft'"
-                          :color "#2c398f"}
-             [:.icon-select-address {:position "relative"}
-              [:&:after {:position "absolute"
-                         :content "'\\e911'"
-                         :transform "rotate(90deg)"
-                         :top 0
-                         :right 0
-                         :color "#69c9e0"
-                         :font-size "13px"
-                         :line-height "36px"
-                         :border-radius "28px"
-                         :background-color "#2c398f"
-                         :padding "0px 10px"
-                         :pointer-events "none"}]]
+                          :color primary-color}
+             [:.accounts
+              [:.icon-select-address {:position "relative"}
+               [:&:after {:position "absolute"
+                          :content "'\\e911'"
+                          :transform "rotate(90deg)"
+                          :top 0
+                          :right 0
+                          :color "#69c9e0"
+                          :font-size "13px"
+                          :line-height "36px"
+                          :border-radius "28px"
+                          :background-color primary-color
+                          :padding "0px 10px"
+                          :pointer-events "none"}]]]
              [:select {:height "36px"
                        :width "172px"
                        :margin-left "14px"
                        :padding "0px 16px"
                        :padding-right "60px"
-                       :border "1px solid #47608e"
+                       :border (str "1px solid " secondary-color)
                        :background-color "white"
                        :border-radius "28px"
                        :-webkit-appearance "none"
@@ -64,6 +72,22 @@
                        :color "#c7cdd9"
                        :display "block"}]
              ["select::-ms-expand" {:display "none"}]]])
+
+(defstyles top-mobile
+           [:.top-mobile {:height "43px"}
+            (media/min-tablet {:display "none"})
+            [:.logo {:height "35px"
+                     :margin-top "22px"
+                     :margin-left "-30px"}]
+            [:.icon-menu
+             {:cursor :pointer
+              :position :absolute
+              :top (px 7)
+              :right (px 7)
+              :font-size (px 29)
+              ;; :padding (px 8)
+              :line-height "100%"
+              :color third-color}]])
 
 (defstyles menu
            [:.app-menu {:height "492px"
@@ -85,7 +109,7 @@
                  :padding "18px 20px"
                  :font-size "16px"
                  :text-decoration "none"
-                 :color "#47608e"}
+                 :color secondary-color}
              [:span [:&:before {:display "block"
                                 :width "45px"
                                 :font-size "22px"
@@ -107,7 +131,7 @@
                                                         :font-size "350px"}]
             [:.page-top {:min-height "300px"
                          :padding-left "140px"
-                         :color "#47608e"}
+                         :color secondary-color}
              [:h1 {:margin "0"
                    :font-size "36px"
                    :font-family "filson-soft"
@@ -125,7 +149,7 @@
                          :font-weight "600"}]]])
 
 (defstyles bids
-           [:.bids {:color "#47608e"}
+           [:.bids {:color secondary-color}
             [:h2 {:margin-top "0px"
                   :margin-bottom "16px"
                   :font-family "filson-soft"
@@ -133,7 +157,7 @@
             [:.bid {:line-height "27px"
                     :font-family "proxima-soft"}
              [:a {:font-weight "bold"
-                  :color "#47608e"
+                  :color secondary-color
                   :text-decoration-color "#d1d7e3"}]
              [:.info {:display "flex"
                       :justify-content "space-between"}]
@@ -145,7 +169,7 @@
 (defstyles bids-form
            [:.bids-form {:margin-top "50px"
                          :font-family "proxima-soft"
-                         :color "#47608e"}
+                         :color secondary-color}
             [:h2 {:margin-bottom "40px"
                   :font-size "23px"
                   :font-family "filson-soft"
@@ -204,15 +228,15 @@
 (defstyles footer
            [:.footer {:margin "64px 190px 0px 410px"
                       :font-family "filson-soft"
-                      :color "#47608e"}
+                      :color secondary-color}
             [:.footer-container {:margin-top "25px"
-                                    :display "flex"
-                                    :justify-content "space-between"}]
+                                 :display "flex"
+                                 :justify-content "space-between"}]
             [:.description {:margin-top 0
                             :font-size "18px"
                             :line-height "32px"}]
             [:.district0x-network {:font-size "11px"}
-             [:a {:color "#47608e"
+             [:a {:color secondary-color
                   :text-decoration-color "#d1d7e3"}]]
             [:ul {:margin "0"
                   :padding "0 100px"}
@@ -220,7 +244,7 @@
              [:a {:font-size "13px"
                   :line-height "32px"
                   :font-family "proxima-soft"
-                  :color "#47608e"
+                  :color secondary-color
                   :text-decoration "none"}]]
             [:.button {:display "inline-block"
                        :width "42px"
@@ -236,10 +260,11 @@
             [:.icons {:flex-shrink 0}]])
 
 (defstyles main
-           [:body {:min-width "1250px"
-                   :margin 0
+           [:body {:margin 0
+                   ;:min-width "1250px"
                    :margin-bottom "70px"
-                   :font-family "sans-serif"}]
+                   :font-family "sans-serif"}
+            (media/max-tablet {:margin "0 30px"})]
            [:.app-content {:margin-right "190px"
                            :display "flex"
                            :justify-content "space-between"}]
@@ -248,15 +273,17 @@
                       :font-size "13px"
                       :padding "10px 32px"
                       :font-family "filson-soft"
-                      :background-color "#2c398f"
+                      :background-color primary-color
                       :color "#7cf8fa"
                       :cursor "pointer"
                       :-webkit-box-shadow "0px 4px 0px 0px #E8EAF2"
                       :-moz-box-shadow "0px 4px 0px 0px #E8EAF2"
                       :box-shadow "0px 4px 0px 0px #E8EAF2"}]
-           [:img.logo {:width "200px"}]
+           [:img.logo {:width "200px"
+                       :max-height "100%"}]
            notification
            top
+           top-mobile
            menu
            app-page
            bids
