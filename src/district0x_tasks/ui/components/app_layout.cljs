@@ -189,7 +189,7 @@
   (let [active-account (subscribe [::accounts-subs/active-account])]
     (fn []
       (when-not @active-account
-        [:div.notification-metamask
+        [:div.notification.notification-metamask
          "You have to install / unlock " [:a {:href "https://metamask.io/"} "metamask"] " browser extension to vote."]))))
 
 (defn notifications []
@@ -200,28 +200,38 @@
          {:class (:type @notification)}
          (:message @notification)]))))
 
-(defn layout []
+(defn top []
   (let [accounts (subscribe [::accounts-subs/accounts])
         active-account (subscribe [::accounts-subs/active-account])
         active-account-balance (subscribe [::accounts-balances-subs/active-account-balance :DNT])]
     (fn []
-      [:div.app-container
-       [notification-metamask]
-       [notifications]
-       [:div.top
-        [icons/district0x-logo]
-        [:div.top-right
-         [:span (format/format-token (bn/number @active-account-balance) {:token "DNT"})]
-         [:div.accounts
-          [:div.icon-select-address
-           (into [:select
-                  {:on-click #(dispatch [::events/notification-no-accounts])
-                   :value (str @active-account)
-                   :on-change (fn [event]
-                                (dispatch [::accounts-events/set-active-account event.target.value]))}]
-                 (for [account @accounts]
-                   [:option account]))]]]]
-       [:div.app-content
-        [menu]
-        [page]]
-       [footer]])))
+      [:div.top
+       [icons/district0x-logo]
+       [:div.top-right
+        [:span (format/format-token (bn/number @active-account-balance) {:token "DNT"})]
+        [:div.accounts
+         [:div.icon-select-address
+          (into [:select
+                 {:on-click #(dispatch [::events/notification-no-accounts])
+                  :value (str @active-account)
+                  :on-change (fn [event]
+                               (dispatch [::accounts-events/set-active-account event.target.value]))}]
+                (for [account @accounts]
+                  [:option account]))]]]])))
+
+(defn top-mobile []
+  [:div.top-mobile
+   [icons/district0x-logo]
+   [:div.menu
+    [:span.icon-menu]]])
+
+(defn layout []
+  [:div.app-container
+   [notification-metamask]
+   [notifications]
+   [top]
+   [top-mobile]
+   #_[:div.app-content
+      [menu]
+      #_[page]]
+   #_[footer]])
