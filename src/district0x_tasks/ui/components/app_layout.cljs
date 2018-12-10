@@ -75,8 +75,10 @@
     [:span {:class icon}]
     title]])
 
-(defn menu []
+(defn menu [menu-open?]
   [:div.app-menu
+   (when-not @menu-open?
+     {:class "menu-closed"})
    (into [:ul] (map #(menu-item %) pages))])
 
 (defn page []
@@ -170,20 +172,18 @@
 (defn footer []
   [:div.footer
    [icons/district0x-logo]
-   [:div.footer-container
-    [:div
-     [:p.description "A network of decentralised markets and communities. Create, operate, and govern. Powered by Ethereum, Aragon and IPFS."]
-     [:p.district0x-network "Part of the " [:a {:href "http://district0x.io"} "district0x Network"]]]
-    [:ul
-     [:li [:a {:href "https://blog.district0x.io/"} "Blog"]]
-     [:li [:a {:href "https://district0x.io/team/"} "Team"]]
-     [:li [:a {:href "https://district0x.io/transparency/"} "Transparency"]]
-     [:li [:a {:href "https://district0x.io/faq/"} "FAQ"]]]
-    [:div.icons
-     [:a.icon-reddit.button {:href "https://www.reddit.com/r/district0x"}]
-     [:a.icon-twitter.button {:href "https://twitter.com/district0x"}]
-     [:a.icon-medium.button {:href "https://blog.district0x.io/"}]
-     [:a.icon-github.button {:href "https://github.com/district0x"}]]]])
+   [:div.description "A network of decentralised markets and communities. Create, operate, and govern. Powered by Ethereum, Aragon and IPFS."]
+   [:div.district0x-network "Part of the " [:a {:href "http://district0x.io"} "district0x Network"]]
+   [:ul
+    [:li [:a {:href "https://blog.district0x.io/"} "Blog"]]
+    [:li [:a {:href "https://district0x.io/team/"} "Team"]]
+    [:li [:a {:href "https://district0x.io/transparency/"} "Transparency"]]
+    [:li [:a {:href "https://district0x.io/faq/"} "FAQ"]]]
+   [:div.icons
+    [:a.icon-reddit.button {:href "https://www.reddit.com/r/district0x"}]
+    [:a.icon-twitter.button {:href "https://twitter.com/district0x"}]
+    [:a.icon-medium.button {:href "https://blog.district0x.io/"}]
+    [:a.icon-github.button {:href "https://github.com/district0x"}]]])
 
 (defn notification-metamask []
   (let [active-account (subscribe [::accounts-subs/active-account])]
@@ -219,19 +219,28 @@
                 (for [account @accounts]
                   [:option account]))]]]])))
 
-(defn top-mobile []
+(defn top-mobile [open?]
   [:div.top-mobile
    [icons/district0x-logo]
    [:div.menu
+    {:on-click (fn [e]
+                 (.stopPropagation e)
+                 (swap! open? not))}
     [:span.icon-menu]]])
 
 (defn layout []
-  [:div.app-container
-   [notification-metamask]
-   [notifications]
-   [top]
-   [top-mobile]
-   #_[:div.app-content
-      [menu]
-      #_[page]]
-   #_[footer]])
+  (let [menu-open? (r/atom false)]
+    (fn []
+      [:div.app-container
+       [notification-metamask]
+       [notifications]
+       [top]
+       [top-mobile menu-open?]
+       [:div.app-content
+        [menu menu-open?]
+        [:div {:style {:height "200px"
+                       :width "100%"
+                       :background-color "purple"}}
+         "."]
+        #_[page]]
+       [footer]])))

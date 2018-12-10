@@ -76,28 +76,32 @@
 (defstyles top-mobile
            [:.top-mobile {:height "43px"}
             (media/min-tablet {:display "none"})
-            [:.logo {:height "35px"
-                     :margin-top "22px"
+            [:.logo {:margin-top "22px"
                      :margin-left "-30px"}]
-            [:.icon-menu
-             {:cursor :pointer
-              :position :absolute
-              :top (px 7)
-              :right (px 7)
-              :font-size (px 29)
-              ;; :padding (px 8)
-              :line-height "100%"
-              :color third-color}]])
+            [:.menu {:position :absolute
+                     :top 0
+                     :right 0
+                     :width (px 50)
+                     :height (px 50)
+                     :cursor :pointer
+                     :background-color primary-color}
+             [:.icon-menu
+              {:pointer-events "none"
+               :font-size (px 29)
+               :position :absolute
+               :top (px 7)
+               :right (px 7)
+               :line-height "100%"
+               :color third-color}]]])
 
 (defstyles menu
-           [:.app-menu {:height "492px"
-                        :width "300px"
-                        :margin-right "160px"
+           [:.app-menu {:margin-right "160px"
                         :border-radius "0 10px 10px 0"
                         :-webkit-box-shadow "0px 0px 120px 0px rgba(73, 79, 104, 0.11)"
                         :-moz-box-shadow "0px 0px 120px 0px rgba(73, 79, 104, 0.11)"
                         :box-shadow "0px 0px 120px 0px rgba(73, 79, 104, 0.11)"
-                        :font-family "proxima-nova"}
+                        :font-family "proxima-nova"
+                        :background-color "white"}
             [:ul {:margin "0"
                   :padding "0"
                   :width "250px"}
@@ -114,7 +118,11 @@
                                 :width "45px"
                                 :font-size "22px"
                                 :font-weight "bold"
-                                :color "#88e4e6"}]]]])
+                                :color "#88e4e6"}]]]
+            (media/max-tablet {:position "absolute"
+                               :top (px 80)
+                               :left 0})]
+           (media/max-tablet [:.menu-closed {:display "none"}]))
 
 (defstyles app-page
            [:.app-page {:width "100%"
@@ -226,38 +234,51 @@
            [:.vote {:display "flex"
                     :justify-content "flex-end"}])
 (defstyles footer
-           [:.footer {:margin "64px 190px 0px 410px"
+           [:.footer {:display "grid"
                       :font-family "filson-soft"
                       :color secondary-color}
-            [:.footer-container {:margin-top "25px"
-                                 :display "flex"
-                                 :justify-content "space-between"}]
-            [:.description {:margin-top 0
+            [:.description {:grid-area "description"
                             :font-size "18px"
                             :line-height "32px"}]
-            [:.district0x-network {:font-size "11px"}
+            [:.district0x-network {:grid-area "district0x"
+                                   :font-size "11px"}
              [:a {:color secondary-color
                   :text-decoration-color "#d1d7e3"}]]
-            [:ul {:margin "0"
-                  :padding "0 100px"}
-             [:li {:list-style-type "none"}]
-             [:a {:font-size "13px"
-                  :line-height "32px"
-                  :font-family "proxima-soft"
-                  :color secondary-color
-                  :text-decoration "none"}]]
-            [:.button {:display "inline-block"
-                       :width "42px"
-                       :line-height "42px"
-                       :padding "0px"
-                       :border-radius "50%"
-                       :font-size "16px"
-                       :text-align "center"
-                       :vertical-align "middle"
-                       :text-decoration "none"
-                       :margin-left "10px"}]
-            [:.icon-github.button {:font-size "18px"}]
-            [:.icons {:flex-shrink 0}]])
+            [:.icons {:grid-area "icons"
+                      :display "grid"
+                      :grid-template-columns "auto auto auto auto"
+                      :justify-items "end"}
+             [:.button {:display "inline-block"
+                        :width "42px"
+                        :height "42px"
+                        :line-height "42px"
+                        :padding "0px"
+                        :border-radius "50%"
+                        :font-size "16px"
+                        :text-align "center"
+                        :vertical-align "middle"
+                        :text-decoration "none"}
+              [:&.icon-github {:font-size "18px"}]]]]
+           (media/min-tablet
+             [:.footer {:margin "64px 190px 0px 410px"
+                        :grid-template-columns "auto auto 208px"
+                        :grid-gap "35px 10%"
+                        :grid-template-areas "'logo . .' 'description links icons' 'district0x links .'"}
+              [:ul {:grid-area "links"
+                    :margin 0
+                    :padding 0}
+               [:li {:list-style-type "none"}]
+               [:a {:font-size "13px"
+                    :line-height "32px"
+                    :font-family "proxima-soft"
+                    :color secondary-color
+                    :text-decoration "none"}]]])
+           (media/max-tablet
+             [:.footer {:margin-top "80px"
+                        :grid-row-gap "40px"
+                        :grid-template-areas "'logo' 'description' 'icons' 'district0x'"
+                        :justify-items "center"}
+              [:ul {:display "none"}]]))
 
 (defstyles main
            [:body {:margin 0
@@ -265,9 +286,10 @@
                    :margin-bottom "70px"
                    :font-family "sans-serif"}
             (media/max-tablet {:margin "0 30px"})]
-           [:.app-content {:margin-right "190px"
-                           :display "flex"
-                           :justify-content "space-between"}]
+           [:.app-content {:display "flex"
+                           :justify-content "space-between"}
+            ;(media/max-tablet {:margin-top "50px"})
+            (media/min-tablet {:margin-right "190px"})]
            [:.button {:border "none"
                       :border-radius "28px"
                       :font-size "13px"
@@ -281,6 +303,7 @@
                       :box-shadow "0px 4px 0px 0px #E8EAF2"}]
            [:img.logo {:width "200px"
                        :max-height "100%"}]
+           (media/max-tablet [:img.logo {:height "35px"}])
            notification
            top
            top-mobile
