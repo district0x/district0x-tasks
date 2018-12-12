@@ -74,7 +74,7 @@
              ["select::-ms-expand" {:display "none"}]]])
 
 (defstyles top-mobile
-           [:.top-mobile {:height "43px"}
+           [:.top-mobile
             (media/min-tablet {:display "none"})
             [:.logo {:margin-top "22px"
                      :margin-left "-30px"}]
@@ -125,26 +125,18 @@
            (media/max-tablet [:.menu-closed {:display "none"}]))
 
 (defstyles app-page
-           [:.app-page {:width "100%"
-                        :position "relative"
-                        :flex-grow "1"
-                        :padding "90px 80px 70px 140px"
-                        :border-radius "10px"
-                        :-webkit-box-shadow "0px 0px 120px 0px rgba(73, 79, 104, 0.11)"
-                        :-moz-box-shadow "0px 0px 120px 0px rgba(73, 79, 104, 0.11)"
-                        :box-shadow "0px 0px 120px 0px rgba(73, 79, 104, 0.11)"}
+           [:.app-page {:width "100%"}
             ["[class^=\"icon-\"], [class*=\" icon-\"]" {:position "absolute"
                                                         :top "0"
                                                         :left "95px"
                                                         :font-size "350px"}]
+            [:h1 {:margin "0"
+                  :font-size "36px"
+                  :font-family "filson-soft"
+                  :font-weight "300"
+                  :color "#232e80"}]
             [:.page-top {:min-height "300px"
-                         :padding-left "140px"
                          :color secondary-color}
-             [:h1 {:margin "0"
-                   :font-size "36px"
-                   :font-family "filson-soft"
-                   :font-weight "300"
-                   :color "#232e80"}]
              [:.description {:margin-top "46px"
                              :margin-bottom "0px"
                              :line-height "32px"
@@ -154,7 +146,22 @@
                          :margin-bottom "48px"
                          :font-size "16px"
                          :font-family "proxima-soft"
-                         :font-weight "600"}]]])
+                         :font-weight "600"}]]]
+           (media/min-tablet [:.app-page {:flex-grow "1"
+                                          :position "relative"
+                                          :padding "90px 80px 70px 140px"
+                                          :border-radius "10px"
+                                          :-webkit-box-shadow "0px 0px 120px 0px rgba(73, 79, 104, 0.11)"
+                                          :-moz-box-shadow "0px 0px 120px 0px rgba(73, 79, 104, 0.11)"
+                                          :box-shadow "0px 0px 120px 0px rgba(73, 79, 104, 0.11)"}
+                              [:.page-top {:padding-left "140px"}]])
+           (media/max-tablet [:.app-page {:margin-top (px 235)}
+                              [:.page-top
+                               [:.description {:margin-top (px 36)}]
+                               [:.bidding {:margin-top (px 36)}]]
+                              ["[class^=\"icon-\"], [class*=\" icon-\"]" {:top (px -90)
+                                                                          :left "auto"
+                                                                          :right "100px"}]]))
 
 (defstyles bids
            [:.bids {:color secondary-color}
@@ -172,7 +179,8 @@
              [:.description {:margin-top "0px"
                              :margin-bottom "36px"
                              :white-space "pre-wrap"}]]
-            [".bid:not(:first-of-type)" {:margin-top "140px"}]])
+            [".bid:not(:first-of-type)" {:margin-top "140px"}]
+            (media/max-tablet [".bid:not(:first-of-type)" {:margin-top (px 75)}])])
 
 (defstyles bids-form
            [:.bids-form {:margin-top "50px"
@@ -282,13 +290,11 @@
 
 (defstyles main
            [:body {:margin 0
-                   ;:min-width "1250px"
                    :margin-bottom "70px"
                    :font-family "sans-serif"}
             (media/max-tablet {:margin "0 30px"})]
            [:.app-content {:display "flex"
                            :justify-content "space-between"}
-            ;(media/max-tablet {:margin-top "50px"})
             (media/min-tablet {:margin-right "190px"})]
            [:.button {:border "none"
                       :border-radius "28px"

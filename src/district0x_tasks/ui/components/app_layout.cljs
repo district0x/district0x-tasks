@@ -238,9 +238,5 @@
        [top-mobile menu-open?]
        [:div.app-content
         [menu menu-open?]
-        [:div {:style {:height "200px"
-                       :width "100%"
-                       :background-color "purple"}}
-         "."]
-        #_[page]]
+        [page]]
        [footer]])))
