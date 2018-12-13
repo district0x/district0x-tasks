@@ -9,14 +9,17 @@
                   :large 1200
                   :wide 1920})
 
-(defn- media [{:keys [min-width max-width]} css]
-  (let [media-query (cond-> {:screen true}
-                            min-width (assoc :min-width (str min-width "px"))
-                            max-width (assoc :max-width (str max-width "px")))]
+(defn media [{:keys [min-width max-width]} css]
+  (let [min-width (some-> (get breakpoints min-width)
+                          (inc))
+        max-width (get breakpoints max-width)
+        media-query (cond-> {:screen true}
+                            min-width (assoc :min-width (px min-width))
+                            max-width (assoc :max-width (px max-width)))]
     (at-media media-query [:& css])))
 
 (defn min-tablet [css]
-  (media {:min-width (inc (:tablet breakpoints))} css))
+  (media {:min-width :tablet} css))
 
 (defn max-tablet [css]
-  (media {:max-width (:tablet breakpoints)} css))
+  (media {:max-width :tablet} css))

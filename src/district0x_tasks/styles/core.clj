@@ -1,7 +1,7 @@
 (ns district0x-tasks.styles.core
   (:require [garden.def :refer [defstyles]]
             [district0x-tasks.styles.base.media :as media]
-            [garden.units :refer [rem px em]]))
+            [garden.units :refer [px em]]))
 
 (def primary-color "#2c398f")
 (def secondary-color "#47608e")
@@ -20,8 +20,6 @@
             [:.success {:background-color "#C5E1A5"}]]
            [:.notification-metamask {:position "static"
                                      :background-color "#E1F5FE"}])
-
-(println (media/max-tablet [:& {:display "none"}]))
 
 (defstyles top
            [:.top {:margin-bottom "66px"
@@ -192,23 +190,21 @@
                   :font-weight "normal"}]
             [:.button {:padding "14px 48px"
                        :font-size "18px"}]
-            [:.form-container {:display "flex"
-                               :justify-content "space-between"}]
-            [:.left {:width "40%"
-                     :min-width "180px"
+            [:.form-container {:display "grid"}
+             (media/media {:min-width :large} {:grid-template-columns "auto 1fr"
+                                               :grid-column-gap (px 35)})
+             (media/media {:max-width :large} {:grid-template-columns "auto"
+                                               :grid-row-gap (px 20)})]
+            [:.left {:min-width "180px"
                      :max-width "410px"
-                     :margin-bottom "6pz"
-                     :display "flex"
-                     :flex-direction "column"
-                     :justify-content "space-between"}]
+                     :display "grid"
+                     :grid-template-columns "auto"}]
             [:input {:width "100%"
                      :border-width "0 0 1px 0"
                      :border-color "#E0DFE6"
                      :font-family "proxima-soft"
                      :font-size "16px"
                      :line-height "30px"}]
-            [".form-container > .input-group" {:flex-grow 2
-                                               :margin-left "35px"}]
             [:textarea {:box-sizing "border-box"
                         :width "100%"
                         :height "165px"
@@ -226,7 +222,9 @@
              [:input {:width "calc(100% - 40px)"
                       :padding-right "40px"}]]
             [:.unit {:display "inline"}]
-            [:.button {:float "right"}]])
+            [:.button
+             (media/media {:min-width :large} {:float "right"})
+             (media/media {:max-width :large} {:width "100%"})]])
 
 (defstyles votes
            [:.votes-line {:display "flex"}
@@ -254,8 +252,10 @@
                   :text-decoration-color "#d1d7e3"}]]
             [:.icons {:grid-area "icons"
                       :display "grid"
-                      :grid-template-columns "auto auto auto auto"
-                      :justify-items "end"}
+                      :grid-template-columns "auto auto auto auto"}
+             (media/min-tablet {:justify-items "end"})
+             (media/max-tablet {:width "100%"
+                                :justify-content "space-between"})
              [:.button {:display "inline-block"
                         :width "42px"
                         :height "42px"
@@ -282,7 +282,7 @@
                     :color secondary-color
                     :text-decoration "none"}]]])
            (media/max-tablet
-             [:.footer {:margin-top "80px"
+             [:.footer {:margin-top "90px"
                         :grid-row-gap "40px"
                         :grid-template-areas "'logo' 'description' 'icons' 'district0x'"
                         :justify-items "center"}
@@ -292,7 +292,7 @@
            [:body {:margin 0
                    :margin-bottom "70px"
                    :font-family "sans-serif"}
-            (media/max-tablet {:margin "0 30px"})]
+            (media/max-tablet {:margin "0 30px 50px 30px"})]
            [:.app-content {:display "flex"
                            :justify-content "space-between"}
             (media/min-tablet {:margin-right "190px"})]
